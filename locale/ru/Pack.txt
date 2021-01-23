@@ -1,0 +1,7 @@
+﻿Common languages: Обычные языки. 
+Heavy armor: Тяжелые доспехи. 
+Light armor: Легкие доспехи. 
+Martial weapons: Военное оружие. 
+Medium armor: Средние доспехи. 
+Shields: Щиты. 
+Simple weapons: Простое оружие. 

@@ -1,0 +1,12 @@
+﻿LanguageAbysal: Язык бездны. 
+LanguageCelestial: Небесный язык. 
+LanguageCommon: Всеобщий язык. 
+LanguageDeepSpeech: Глубинная речь. 
+LanguageDraconic: Драконий язык. 
+LanguageDwarvish: Дварфский язык.
+LanguageElvish: Эльфийский язык. 
+LanguageGiant: Великаний язык. 
+LanguageGoblin: Гоблинский язык. 
+LanguageHalfling: Язык полуросликов. 
+LanguageInfernal: Инфернальный язык. 
+LanguageOrc: Орочий. 

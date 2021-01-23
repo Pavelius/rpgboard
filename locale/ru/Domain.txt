@@ -1,0 +1,7 @@
+﻿KnowledgeDomain: Домен знаний. 
+LifeDomain: Домен жизни. 
+LightDomain: Домен света. 
+NatureDomain: Домен природы. 
+TempestDomain: Домен бури. 
+TrickeryDomain: Домен обмана. 
+WarDomain: Домен войны. 
