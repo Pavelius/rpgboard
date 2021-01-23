@@ -829,7 +829,7 @@ variant variantc::chooseg(const char* step, const char* title, int score) const 
 				execute(set_info, e);
 		}
 		render_left(x1, y, w2, score);
-		render_description(x + w2, y0, w - w2 - (x - x1));
+		render_description(x + w2 + metrics::padding*2, y0, w - w2 - (x - x1) - metrics::padding*2);
 		x = x1 + w;
 		y = y1 - gui_border - texth() - metrics::padding * 2;
 		if(button(x, y, 100, "OK", 0, KeyEnter))

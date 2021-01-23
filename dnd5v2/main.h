@@ -373,7 +373,7 @@ struct statistic {
 	traitf				traits;
 	skillf				skills, skills_advantage, skills_double;
 	damagef				damage_resist, damage_immunity, damage_vulnerable;
-	itemf				proficiency, mastery;
+	itemf				items_proficiency, items_mastery;
 	languagef			languages;
 	fightstylef			fightstyle;
 	static ability_s	all_abilities[6];
@@ -395,7 +395,7 @@ class creaturei : public drawable, public nameablei, public statistic {
 	void				apply(variant v, modifier_s modifier);
 	void				apply(variant object, int level, bool interactive);
 	void				finish();
-	bool				have(variant v) const;
+	bool				have(variant v, modifier_s modifier) const;
 public:
 	void				clear() { memset(this, 0, sizeof(*this)); }
 	void				create(race_s race, class_s clas, gender_s gender);
@@ -404,7 +404,7 @@ public:
 	bool				is(trait_s v) const { return traits.is(v); }
 	bool				is(state_s v) const { return state.is(v); }
 	bool				isfocus(item_s v) { return spells_focus.is(v); }
-	bool				isproficiency(item_s v) const { return proficiency.is(v); }
+	bool				isproficiency(item_s v) const { return items_proficiency.is(v); }
 	void				paint(int x0, int y0, bool allow_drag, bool allow_click) const;
 	void				remove(trait_s v) { traits.remove(v); }
 	void				set(class_s v, int i) { classes[v] = i; }

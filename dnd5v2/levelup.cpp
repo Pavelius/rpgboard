@@ -81,6 +81,11 @@ BSDATA(levelupi) = {
 	{"Extra attack", Fighter, 5, {ExtraAttack}},
 	{"Extra attack", Fighter, 11, {ThirdAttacks}},
 	{"Extra attack", Fighter, 11, {FourthAttacks}},
+	{"Armor", Rogue, 1, {LightArmor}},
+	{"Weapons", Rogue, 1, {SimpleWeapons, CrossbowHand, Longsword, Rapier, Shortsword}},
+	{"Saving Throws", Rogue, 1, {SaveVsDexterity, SaveVsIntellegence}},
+	{"Skill Proficiencies", Rogue, 1, {Acrobatics, Athletics, Deception, Insight, Intimidation, Investigation, Perception, Performance, Persuasion, SleightOfHands, Stealth}, 4},
+	{"Expertise", Rogue, 1, {DoubleMastery, Acrobatics, Athletics, Deception, Insight, Intimidation, Investigation, Perception, Performance, Persuasion, SleightOfHands, Stealth, TheivesTools}, 2},
 };
 BSDATAF(levelupi)
 
@@ -94,12 +99,21 @@ void creaturei::apply(const varianta& source, modifier_s m) {
 	}
 }
 
-bool creaturei::have(variant v) const {
+bool creaturei::have(variant v, modifier_s m) const {
 	switch(v.type) {
-	case Item: return proficiency.is(v.value);
+	case Item:
+		switch(m) {
+		case Focus: return spells_focus.is(v.value);
+		case DoubleMastery: return items_mastery.is(v.value);
+		default: return items_proficiency.is(v.value);
+		}
 	case FightingStyle: return fightstyle.is(v.value);
 	case Language: return languages.is(v.value);
-	case Skill: return skills.is(v.value);
+	case Skill:
+		switch(m) {
+		case DoubleMastery: return skills_double.is(v.value);
+		default: return skills.is(v.value);
+		}
 	case Spell: return spells_known.is(v.value);
 	case Trait: return traits.is(v.value);
 	default: return false;
@@ -117,7 +131,8 @@ void creaturei::apply(variant v, modifier_s m) {
 	case Item:
 		switch(m) {
 		case Focus: spells_focus.set(v.value); break;
-		default: proficiency.set(v.value); break;
+		case DoubleMastery: items_mastery.set(v.value); break;
+		default: items_proficiency.set(v.value); break;
 		}
 		break;
 	case Language:
@@ -153,14 +168,23 @@ void creaturei::apply(variant object, int level, bool interactive) {
 		if(ei.count) {
 			for(auto i = ei.count; i > 0; i--) {
 				variantc source;
+				auto m = NoModifier;
 				for(auto e : ei.source) {
-					if(have(e))
+					if(e.type == Modifier) {
+						m = (modifier_s)e.value;
 						continue;
+					}
+					if(have(e, m))
+						continue;
+					if(m != NoModifier) {
+						if(!have(e, NoModifier))
+							continue;
+					}
 					source.add(e);
 				}
 				source.sort();
 				variant v1 = source.chooseg(ei.name, ei.text, i);
-				apply(v1, NoModifier);
+				apply(v1, m);
 			}
 		} else
 			apply(ei.source);

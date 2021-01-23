@@ -143,7 +143,7 @@ void creaturei::generate(bool interactive) {
 	if(!v)
 		return;
 	//auto cls = (class_s)v.value;
-	auto cls = Fighter;
+	auto cls = Rogue;
 	if(false)
 		choose_ability(ChooseAbilities);
 	else
