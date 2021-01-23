@@ -23,7 +23,7 @@ enum background_s : unsigned char {
 	Acolyte, Criminal, FolkHero, Noble, Sage, Soldier,
 };
 enum generate_s : unsigned char {
-	ChooseAbilities, ChooseAlignment, ChooseBackground, ChooseClass, ChooseGender, ChooseRace,
+	ChooseAbilities, ChooseAlignment, ChooseBackground, ChooseClass, ChooseGender, ChoosePortrait, ChooseRace,
 };
 enum pack_s : unsigned char {
 	LightArmor, MediumArmor, HeavyArmor, Shields,
@@ -379,6 +379,7 @@ struct statistic {
 	static ability_s	all_abilities[6];
 	bool				choose_ability(generate_s id);
 	bool				choose_ability(const char* step, const char* title, int score_maximum);
+	static int			choose_frame(resource_s resource, const char* header, const char* description, point size);
 	int					getabilityscore(int v);
 	int					getabilityscores() const;
 	void				random_ability(class_s clas);
@@ -399,7 +400,7 @@ class creaturei : public drawable, public nameablei, public statistic {
 public:
 	void				clear() { memset(this, 0, sizeof(*this)); }
 	void				create(race_s race, class_s clas, gender_s gender);
-	void				generate(bool interactive);
+	bool				generate(bool interactive);
 	alignment_s			getalignment() const { return alignment; }
 	bool				is(trait_s v) const { return traits.is(v); }
 	bool				is(state_s v) const { return state.is(v); }

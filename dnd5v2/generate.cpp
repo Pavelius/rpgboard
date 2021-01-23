@@ -6,6 +6,7 @@ BSDATA(generatei) = {
 	{"ChooseBackground", 4},
 	{"ChooseClass", 2},
 	{"ChooseGender", 4},
+	{"ChoosePortrait", 4},
 	{"ChooseRace", 1},
 };
 assert_enum(generatei, ChooseRace)
@@ -78,6 +79,16 @@ static variant choose_background(bool interactive) {
 	return choose_step(source, ChooseBackground, interactive, true);
 }
 
+static int choose_portrait(bool interactive) {
+	if(!interactive)
+		return xrand(0, 3);
+	char temp[260]; stringbuilder sb(temp);
+	sb.add("иру %1i.", bsdata<generatei>::elements[ChoosePortrait].index);
+	sb.adds(bsdata<generatei>::elements[ChoosePortrait].name);
+	sb.add(".");
+	return creaturei::choose_frame(ResAvatars, temp, bsdata<generatei>::elements[ChoosePortrait].text, {70, 70});
+}
+
 static int compare_best_ability(const void* p1, const void* p2) {
 	return *((char*)p2) - *((char*)p1);
 }
@@ -133,40 +144,43 @@ bool statistic::choose_ability(generate_s id) {
 	return choose_ability(temp, bsdata<generatei>::elements[id].text, 27);
 }
 
-void creaturei::generate(bool interactive) {
+bool creaturei::generate(bool interactive) {
 	variant v;
-	v = choose_race(false);
+	v = choose_race(interactive);
 	if(!v)
-		return;
+		return false;
 	auto race = (race_s)v.value;
-	v = choose_class(false);
+	v = choose_class(interactive);
 	if(!v)
-		return;
-	//auto cls = (class_s)v.value;
-	auto cls = Rogue;
+		return false;
+	auto cls = (class_s)v.value;
 	if(false)
 		choose_ability(ChooseAbilities);
 	else
 		random_ability(cls);
-	v = choose_gender(false);
+	v = choose_gender(interactive);
 	if(!v)
-		return;
+		return false;
 	auto gender = (gender_s)v.value;
-	v = choose_alignment(false);
+	v = choose_alignment(interactive);
 	if(!v)
-		return;
+		return false;
 	auto alignment = (alignment_s)v.value;
-	//v = choose_background(interactive);
-	v = Criminal;
+	v = choose_background(interactive);
 	if(!v)
-		return;
+		return false;
 	auto background = (background_s)v.value;
+	auto portrait = choose_portrait(interactive);
+	if(portrait == -1)
+		return false;
 	auto race_parent = bsdata<racei>::elements[race].base;
 	set(cls, 1);
 	if(race_parent != race)
-		apply(race_parent, 0, false);
-	apply(race, 0, false);
-	apply(background, 0, false);
+		apply(race_parent, 0, interactive);
+	apply(race, 0, interactive);
+	apply(background, 0, interactive);
 	apply(cls, 1, interactive);
+	setframe(ResAvatars, portrait);
 	finish();
+	return true;
 }

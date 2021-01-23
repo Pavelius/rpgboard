@@ -35,6 +35,8 @@ callback				draw::domodal;
 static point			half_grid = {grid_size / 2, grid_size / 2};
 const int				size = 50;
 const int				right_width = 220;
+const auto				dialog_w = 640;
+const auto				dialog_h = 480;
 const bool				show_map_index = false;
 const unsigned char		opacity_button = 220;
 const unsigned char		opacity_disabled = 50;
@@ -796,31 +798,45 @@ static void render_left(int x, int y, int w, int v) {
 	textf(x, y, w, temp);
 }
 
-variant variantc::chooseg(const char* step, const char* title, int score) const {
+static void dialog(int& x, int& y, const char* header, const char* description) {
+	auto push_font = font;
+	auto push_fore = fore;
+	x = (getwidth() - dialog_w) / 2;
+	y = (getheight() - dialog_h) / 2 - texth() - gui_border * 4;
+	if(y < gui_border * 2)
+		y = gui_border * 2;
+	window({x, y, x + dialog_w, y + dialog_h}, false);
+	if(header) {
+		font = metrics::h1;
+		fore = colors::h1;
+		y += textf(x, y, dialog_w, header);
+	}
+	if(description) {
+		font = metrics::h2;
+		fore = colors::text;
+		y += textf(x, y, dialog_w, description) + metrics::padding * 2;
+	}
+	fore = push_fore;
+	font = push_font;
+}
+
+static void footer(int& x, int& y) {
+	x = (getwidth() - dialog_w) / 2 + dialog_w;
+	y = (getheight() - dialog_h) / 2 - texth() - gui_border * 4;
+	if(y < gui_border * 2)
+		y = gui_border * 2;
+	y += dialog_h - texth() - gui_border * 2;
+}
+
+variant variantc::chooseg(const char* header, const char* description, int score) const {
+	int x, y;
 	openform();
 	if(*this)
 		current_info = data[0];
 	while(ismodal()) {
 		render_main();
-		const auto w = 640, h = 480;
-		auto x = (getwidth() - w) / 2;
-		auto y = (getheight() - h) / 2 - texth() - gui_border * 4;
-		if(y < gui_border * 2)
-			y = gui_border * 2;
-		auto y1 = y + h;
-		window({x, y, x + w, y + h}, false);
-		auto push_font = font;
-		auto push_fore = fore;
-		if(step) {
-			font = metrics::h1;
-			fore = colors::h1;
-			y += textf(x, y, w, step);
-		}
-		font = metrics::font;
-		fore = colors::text;
-		y += textf(x, y, w, title) + metrics::padding * 2;
-		auto x1 = x;
-		auto y0 = y;
+		dialog(x, y, header, description);
+		auto x1 = x, y0 = y;
 		x += metrics::padding * 2;
 		const auto w2 = 180;
 		for(auto& e : *this) {
@@ -829,12 +845,11 @@ variant variantc::chooseg(const char* step, const char* title, int score) const 
 				execute(set_info, e);
 		}
 		render_left(x1, y, w2, score);
-		render_description(x + w2 + metrics::padding*2, y0, w - w2 - (x - x1) - metrics::padding*2);
-		x = x1 + w;
-		y = y1 - gui_border - texth() - metrics::padding * 2;
+		render_description(x + w2 + metrics::padding * 2, y0, dialog_w - w2 - (x - x1) - metrics::padding * 2);
+		footer(x, y);
 		if(button(x, y, 100, "OK", 0, KeyEnter))
 			execute(buttonparam, current_info);
-		if(button(x, y, 100, "Cancel", 0, KeyEnter))
+		if(button(x, y, 100, "Cancel", 0, KeyEscape))
 			execute(buttonparam, 0);
 		domodal();
 		if(control_dialog())
@@ -847,6 +862,11 @@ variant variantc::chooseg(const char* step, const char* title, int score) const 
 
 static void set_num8() {
 	auto p = (unsigned char*)hot.object;
+	*p = hot.param;
+}
+
+static void set_num32() {
+	auto p = (unsigned*)hot.object;
 	*p = hot.param;
 }
 
@@ -867,28 +887,77 @@ static void render_cost(int x, int y, int w, int v, int m) {
 	textf(x, y, w, temp);
 }
 
-bool statistic::choose_ability(const char* step, const char* title, int score_maximum) {
+int	statistic::choose_frame(resource_s resource, const char* header, const char* description, point size) {
+	int x, y;
+	auto ps = gres(resource);
+	if(!ps)
+		return -1;
+	int current = 0;
 	openform();
 	while(ismodal()) {
 		render_main();
-		const auto w = 640, h = 480;
-		auto x = (getwidth() - w) / 2;
-		auto y = (getheight() - h) / 2 - texth() - gui_border * 4;
-		if(y < gui_border * 2)
-			y = gui_border * 2;
-		auto y1 = y + h;
-		window({x, y, x + w, y + h}, false);
-		auto push_font = font;
-		auto push_fore = fore;
-		if(step) {
-			font = metrics::h1;
-			fore = colors::h1;
-			y += textf(x, y, w, step);
+		dialog(x, y, header, description);
+		auto x1 = x, y0 = y;
+		x += metrics::padding * 2;
+		const auto w = dialog_w;
+		auto mx = dialog_w / size.x;
+		auto my = dialog_h / size.y;
+		for(auto ty = 0; ty < my; ty++) {
+			for(auto tx = 0; tx < mx; tx++) {
+				auto frame = ty * mx + tx;
+				if(frame >= ps->count)
+					break;
+				rect rc;
+				rc.x1 = x + tx * size.x;
+				rc.y1 = y + ty * size.y;
+				rc.x2 = rc.x1 + size.x - 1;
+				rc.y2 = rc.y1 + size.y - 1;
+				auto focus = &ps->get(frame);
+				auto focused = isfocused(rc, focus);
+				if(area(rc)) {
+					if(hot.pressed)
+						rectf(rc, colors::border, 64);
+					else
+						rectf(rc, colors::border, 32);
+					if(hot.key == MouseLeft && hot.pressed)
+						setfocus((int)focus, false);
+					if((hot.key == MouseLeft && !hot.pressed)
+						|| (focused && hot.key==KeyEnter))
+						execute(set_num32, frame, &current);
+				}
+				if(current == frame) {
+					rectb(rc, colors::active);
+					rectb({rc.x1 + 1, rc.y1 + 1, rc.x2 - 1, rc.y2 - 1}, colors::active);
+				}
+				if(focused) {
+					auto r1 = rc;
+					r1.offset(2, 2);
+					rectx(r1, colors::border);
+				}
+				image(rc.x1 + size.x / 2, rc.y1 + size.y / 2, ps, frame, 0);
+			}
 		}
-		fore = colors::text;
-		y += textf(x, y, w, title) + metrics::padding * 2;
-		auto x1 = x;
-		auto y0 = y;
+		footer(x, y);
+		if(button(x, y, 100, "OK", "OK", KeyEnter))
+			execute(buttonparam, current);
+		if(button(x, y, 100, "Cancel", "Cancel", KeyEscape))
+			execute(buttonparam, -1);
+		domodal();
+		if(control_dialog())
+			continue;
+		control_standart();
+	}
+	closeform();
+	return getresult();
+}
+
+bool statistic::choose_ability(const char* header, const char* description, int score_maximum) {
+	int x, y;
+	openform();
+	while(ismodal()) {
+		render_main();
+		dialog(x, y, header, description);
+		auto x1 = x, y0 = y;
 		x += metrics::padding * 2;
 		const auto w2 = 220;
 		auto cost = getabilityscores();
@@ -905,13 +974,12 @@ bool statistic::choose_ability(const char* step, const char* title, int score_ma
 			if((void*)current_focus == vr.getname())
 				current_info = vr;
 		}
-		render_cost(x, y + metrics::padding*2, w2, getabilityscores(), score_maximum);
-		render_description(x + w2 + 4, y0, w - w2 - (x - x1) - 4);
-		x = x1 + w;
-		y = y1 - gui_border - texth() - metrics::padding * 2;
-		if(button(x, y, 100, "OK", "OK", KeyEnter, cost<score_maximum))
+		render_cost(x, y + metrics::padding * 2, w2, getabilityscores(), score_maximum);
+		render_description(x + w2 + 4, y0, dialog_w - w2 - (x - x1) - 4);
+		footer(x, y);
+		if(button(x, y, 100, "OK", "OK", KeyEnter, cost < score_maximum))
 			execute(buttonok);
-		if(button(x, y, 100, "Cancel", "Cancel", KeyEnter))
+		if(button(x, y, 100, "Cancel", "Cancel", KeyEscape))
 			execute(buttoncancel);
 		domodal();
 		if(control_dialog())

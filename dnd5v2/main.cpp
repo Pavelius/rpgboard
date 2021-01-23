@@ -38,9 +38,30 @@ static void test_characters() {
 	p->set(Hostile);
 }
 
-static void test_generate() {
+static void add_character() {
 	creaturei e;
-	e.generate(true);
+	if(!e.generate(true))
+		return;
+	auto p = bsdata<creaturei>::add();
+	if(!p)
+		return;
+	*p = e;
+}
+
+static void test_choose() {
+	creaturei e;
+	e.choose_frame(ResAvatars, "Выбирайте портрет", "Выбирайте портрет вашего персонажа", {70, 70});
+}
+
+static void menu_handle() {
+	while(true) {
+		answers aw;
+		aw.add(1, "Персонажи");
+		aw.add(1, "Настройки");
+		auto id = aw.choose(0);
+		if(id == 1)
+			add_character();
+	}
 }
 
 int main(int argc, char* argv[]) {
@@ -52,7 +73,9 @@ int main(int argc, char* argv[]) {
 	util_main();
 	draw::initialize();
 	test_characters();
-	test_generate();
+	//add_character();
+	menu_handle();
+	//test_choose();
 	//while(true) {
 	//	auto pt = draw::choosepoint();
 	//	pt = m2s(s2m(pt)) - half_grid;
