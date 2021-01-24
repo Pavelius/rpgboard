@@ -135,12 +135,15 @@ static void add_bmp_masked(sprite* p, const char* id, const char* folder) {
 		sprite::RLE, 0, 0, -1, 0);
 }
 
-static void add_png(sprite* p, const char* id, const char* folder, int x = 0, int y = 0, int sx = -1, int sy = -1, int ox = -1, int oy = -1) {
+static void add_png(sprite* p, const char* id, const char* suff, const char* folder, int x = 0, int y = 0, int sx = -1, int sy = -1, int ox = -1, int oy = -1) {
 	static char temp[260];
 	stringbuilder sb(temp);
 	sb.add(folder);
 	sb.add("/");
-	sb.add("%1.png", id);
+	sb.add(id);
+	if(suff)
+		sb.add(suff);
+	sb.add(".png");
 	surface bmp(temp);
 	if(!bmp)
 		return;
@@ -233,6 +236,24 @@ static void create_monsters() {
 	close_pma(p, ResMonsters);
 }
 
+static void create_gui() {
+	static const char* source[] = {
+		{"btn_narrow"},
+		{"btn_paper"},
+		{"btn_small"},
+	};
+	const auto count = sizeof(source) / sizeof(source[0]);
+	const char* surl0 = "D:/resources/gui";
+	auto p = create_pma(count*4);
+	for(auto id : source) {
+		add_png(p, id, "_off", surl0);
+		add_png(p, id, "_over", surl0);
+		add_png(p, id, "_down", surl0);
+		add_png(p, id, "_grey", surl0);
+	}
+	close_pma(p, ResGUI);
+}
+
 void tilei::exportdata() const {
 	char temp[260];
 	stringbuilder sb(temp);
@@ -251,6 +272,7 @@ void tilei::exportdata() const {
 }
 
 void util_main() {
+	create_gui();
 	//create_monsters();
 	//create_avatars();
 	//create_sprites();

@@ -118,7 +118,7 @@ enum spell_s : unsigned char {
 };
 enum resource_s : unsigned char {
 	ResNone,
-	ResDungeon, ResCharacter, ResAvatars, ResMonsters,
+	ResDungeon, ResCharacter, ResGUI, ResAvatars, ResMonsters,
 };
 enum uses_s : unsigned char {
 	ManyTimes, Recharge56, Recharge6, UntilShortRest, UntilLongRest
@@ -439,5 +439,5 @@ template<class T> const char* getinfo(const void* object, stringbuilder& sb) { r
 int						distance(point p1, point p2);
 inline int				m2s(int v) { return v * grid_size; }
 inline point			m2s(point v) { return {v.x * (short)grid_size, v.y * (short)grid_size}; }
-inline int				s2m(int v) { return v / grid_size; }
-inline point			s2m(point v) { return {v.x / (short)grid_size, v.y / (short)grid_size}; }
+inline short			s2m(int v) { return (v >= 0) ? v / grid_size : (v - grid_size) / grid_size; }
+inline point			s2m(point v) { return {s2m(v.x), s2m(v.y)}; }

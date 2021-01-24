@@ -53,14 +53,18 @@ static void test_choose() {
 	e.choose_frame(ResAvatars, "Выбирайте портрет", "Выбирайте портрет вашего персонажа", {70, 70});
 }
 
+void choose_elements();
+
 static void menu_handle() {
 	while(true) {
 		answers aw;
 		aw.add(1, "Персонажи");
-		aw.add(1, "Настройки");
+		aw.add(2, "Настройки");
 		auto id = aw.choose(0);
 		if(id == 1)
 			add_character();
+		else if(id == 2)
+			choose_elements();
 	}
 }
 

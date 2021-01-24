@@ -3,6 +3,7 @@
 BSDATA(resourcei) = {{},
 	{"dungeon", "area"},
 	{"characters", "creatures"},
+	{"gui", "interface"},
 	{"avatars", "interface"},
 	{"monsters", "interface"},
 };

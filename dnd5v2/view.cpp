@@ -3,14 +3,24 @@
 
 using namespace draw;
 
+namespace {
 struct focusable_element {
 	int					id;
 	rect				rc;
 	operator bool() const { return id != 0; }
 };
-struct cube {
-	double x, y, z;
+struct parami {
+	int					origin;
+	int					maximum;
+	int					perpage;
+	void correct() {
+		if(origin + perpage > maximum)
+			origin = maximum - perpage;
+		if(origin < 0)
+			origin = 0;
+	}
 };
+}
 static focusable_element elements[96];
 static focusable_element* render_control;
 static int				current_focus;
@@ -27,17 +37,12 @@ static point			tooltips_point;
 static short			tooltips_width;
 static char				tooltips_text[4096];
 static short unsigned	special_hilite_index;
-const int				map_normal = 1000;
-static int				map_scale = map_normal;
 extern rect				sys_static_area;
-int						distance(point p1, point p2);
 callback				draw::domodal;
 static point			half_grid = {grid_size / 2, grid_size / 2};
 const int				size = 50;
-const int				right_width = 220;
 const auto				dialog_w = 640;
 const auto				dialog_h = 480;
-const bool				show_map_index = false;
 const unsigned char		opacity_button = 220;
 const unsigned char		opacity_disabled = 50;
 const unsigned char		opacity_hilighted = 200;
@@ -828,6 +833,77 @@ static void footer(int& x, int& y) {
 	y += dialog_h - texth() - gui_border * 2;
 }
 
+static void right_panel(int& x, int& y, const char* title, bool cancel_button) {
+	const auto w = 320;
+	x = getwidth() - w - gui_border * 2;
+	y = gui_border * 2;
+	auto y2 = getheight() - gui_border * 2;
+	window({x, y, x + w, y2}, false, false);
+	rect rh = {x, y, x + w, y + 12};
+	if(title) {
+		auto push_font = font;
+		font = metrics::h1;
+		draw::text(rh.x1, rh.y1, title);
+		font = push_font;
+	}
+	if(cancel_button) {
+		rect rc;
+		rc.x1 = getwidth() - gui_border * 2 - 16;
+		rc.y1 = y + 4;
+		rc.x2 = rc.x1 + 12;
+		rc.y2 = rc.y1 + 12;
+		auto result = window(rc, true, true);
+		if((result && hot.key == MouseLeft && !hot.pressed) || hot.key == KeyEscape)
+			execute(buttoncancel);
+	}
+}
+
+static void* choose_element(const char* title, const void* current_value, void** data, unsigned data_count, fntext getname, array* source) {
+	openform();
+	parami params = {};
+	params.maximum = data_count;
+	params.perpage = ((200 - 6 - 16 - 6) / (texth() + 4));
+	auto found_current = false;
+	for(unsigned i = 0; i < data_count; i++) {
+		if(data[i] == current_value) {
+			found_current = true;
+			params.origin = i;
+		}
+	}
+	if(!found_current)
+		current_value = 0;
+	params.correct();
+	setfocus((int)current_value, true);
+	int x, y;
+	while(ismodal()) {
+		render_main();
+		right_panel(x, y, title, true);
+		void* current_element = 0;
+		for(auto i = params.origin; i < params.maximum; i++) {
+			char temp[260]; stringbuilder sb(temp);
+			auto pt = data[i];
+			auto pn = getname(pt, sb);
+			if(!pn)
+				pn = "Нет";
+			y += 2;
+		}
+		domodal();
+		if(control_board())
+			continue;
+	}
+	closeform();
+	return (void*)getresult();
+}
+
+const char* test_name(const void* object, stringbuilder& sb) {
+	return "None";
+}
+
+void choose_elements() {
+	void* source[2] = {};
+	choose_element("Test", 0, source, 2, test_name, 0);
+}
+
 variant variantc::chooseg(const char* header, const char* description, int score) const {
 	int x, y;
 	openform();
@@ -994,7 +1070,7 @@ int answers::choose(const char* title) const {
 	openform();
 	while(ismodal()) {
 		render_main();
-		auto x = getwidth() - 320 - gui_border * 4;
+		auto x = getwidth() - 320 - gui_border * 2;
 		auto y = gui_border * 2;
 		auto w = 320;
 		for(auto& e : elements) {
