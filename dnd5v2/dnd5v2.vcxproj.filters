@@ -37,6 +37,15 @@
     <ClInclude Include="converter.h">
       <Filter>Поддержка</Filter>
     </ClInclude>
+    <ClInclude Include="mutex.h">
+      <Filter>Платформа</Filter>
+    </ClInclude>
+    <ClInclude Include="socket.h">
+      <Filter>Платформа</Filter>
+    </ClInclude>
+    <ClInclude Include="thread.h">
+      <Filter>Платформа</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Поддержка">
@@ -213,6 +222,27 @@
       <Filter>Логика</Filter>
     </ClCompile>
     <ClCompile Include="fighting.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="action.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="mutex.cpp">
+      <Filter>Платформа</Filter>
+    </ClCompile>
+    <ClCompile Include="socket.cpp">
+      <Filter>Платформа</Filter>
+    </ClCompile>
+    <ClCompile Include="thread.cpp">
+      <Filter>Платформа</Filter>
+    </ClCompile>
+    <ClCompile Include="message.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="network.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="menu.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
   </ItemGroup>

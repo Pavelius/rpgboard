@@ -143,7 +143,10 @@ enum trait_s : unsigned char {
 enum variant_s : unsigned char {
 	NoVariant,
 	Ability, Alignment, Background, Class, Creature, DamageType, Domain, FightingStyle,
-	Gender, Generate, Item, Language, Levelup, Modifier, Pack, Race, Save, School, Skill, Spell, Trait,
+	Gender, Generate, Item, Language, Levelup, Menu, Modifier, Pack, Race, Save, School, Skill, Spell, Trait,
+};
+enum action_s : unsigned char {
+	ActionAmbush, ActionAttack, ActionDash,
 };
 const int grid_size = 64;
 typedef cflags<state_s> statef;
@@ -344,6 +347,12 @@ struct resourcei {
 	bool				error;
 	void				geturl(stringbuilder& sb) const;
 };
+struct actioni {
+	const char*			id;
+	duration_s			duration;
+	const char*			name;
+	const char*			text;
+};
 struct tilei {
 	const char*			id;
 	unsigned char		size;
@@ -430,10 +439,21 @@ public:
 	int					random() const;
 	void				sort();
 };
+struct menu {
+	const char*			parent;
+	const char*			id;
+	fncommand			command;
+	fnvisible			visible;
+	const char*			name;
+	const char*			text;
+};
 namespace draw {
 typedef void(*callback)();
 point					choosepoint();
 void					initialize();
+}
+namespace io {
+void					startclient();
 }
 template<class T> const char* getinfo(const void* object, stringbuilder& sb) { return ((T*)object)->text; }
 int						distance(point p1, point p2);

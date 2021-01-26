@@ -148,14 +148,18 @@
     <ClInclude Include="draw.h" />
     <ClInclude Include="io.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="mutex.h" />
     <ClInclude Include="point.h" />
     <ClInclude Include="pointl.h" />
     <ClInclude Include="rect.h" />
+    <ClInclude Include="socket.h" />
     <ClInclude Include="stringbuilder.h" />
+    <ClInclude Include="thread.h" />
     <ClInclude Include="win.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ability.cpp" />
+    <ClCompile Include="action.cpp" />
     <ClCompile Include="activity.cpp" />
     <ClCompile Include="alignment.cpp" />
     <ClCompile Include="answers.cpp" />
@@ -182,7 +186,11 @@
     <ClCompile Include="io.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="menu.cpp" />
+    <ClCompile Include="message.cpp" />
+    <ClCompile Include="mutex.cpp" />
     <ClCompile Include="nameable.cpp" />
+    <ClCompile Include="network.cpp" />
     <ClCompile Include="pack.cpp" />
     <ClCompile Include="png.cpp" />
     <ClCompile Include="point.cpp" />
@@ -191,12 +199,14 @@
     <ClCompile Include="save.cpp" />
     <ClCompile Include="school.cpp" />
     <ClCompile Include="skill.cpp" />
+    <ClCompile Include="socket.cpp" />
     <ClCompile Include="spell.cpp" />
     <ClCompile Include="state.cpp" />
     <ClCompile Include="statistic.cpp" />
     <ClCompile Include="stringbuilder.cpp" />
     <ClCompile Include="surface_serial.cpp" />
     <ClCompile Include="szdup.cpp" />
+    <ClCompile Include="thread.cpp" />
     <ClCompile Include="tile.cpp" />
     <ClCompile Include="trait.cpp" />
     <ClCompile Include="util_main.cpp" />
