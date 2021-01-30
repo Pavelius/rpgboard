@@ -56,6 +56,8 @@ static int				focus_level;
 static int				focus_pressed;
 static variant			current_info;
 
+extern "C" void scale2x(void* void_dst, unsigned dst_slice, const void* void_src, unsigned src_slice, unsigned width, unsigned height);
+
 static const sprite* gres(resource_s id) {
 	auto& e = bsdata<resourcei>::elements[id];
 	if(!e.data) {
@@ -248,6 +250,17 @@ static bool window(rect rc, bool hilight = true, bool pressable = false, int bor
 	return rs;
 }
 
+static void windowm(int x, int& y, int width, const char* title) {
+	auto border = gui_border;
+	rect rc = {x, y, x + width, y}; textf(rc, title);
+	if(rc.x2 < x + width)
+		rc.x2 = x + width;
+	//rc.y2 += border;
+	auto hilited = window(rc, false, false, border);
+	textf(x, y, width, title);
+	y += rc.height() + border * 2;
+}
+
 static bool windowv(int x, int& y, int width, const char* title, unsigned key) {
 	auto border = gui_border;
 	rect rc = {x, y, x + width, y}; textw(rc, title);
@@ -256,6 +269,8 @@ static bool windowv(int x, int& y, int width, const char* title, unsigned key) {
 	rc.y2 += border;
 	auto hilited = window(rc, true, true, border);
 	auto result = hilited && hot.key == MouseLeft && !hot.pressed;
+	if(key && !result && hot.key == key)
+		result = true;
 	text(rc, title, AlignCenterCenter);
 	y += rc.height() + border * 2;
 	return result;
@@ -833,13 +848,16 @@ static void footer(int& x, int& y) {
 	y += dialog_h - texth() - gui_border * 2;
 }
 
-static void right_panel(int& x, int& y, const char* title, bool cancel_button) {
-	const auto w = 320;
-	x = getwidth() - w - gui_border * 2;
+static void right_dialog(int& x, int& y) {
+	x = getwidth() - window_width - gui_border * 2;
 	y = gui_border * 2;
+}
+
+static void right_panel(int& x, int& y, const char* title, bool cancel_button) {
+	right_dialog(x, y);
 	auto y2 = getheight() - gui_border * 2;
-	window({x, y, x + w, y2}, false, false);
-	rect rh = {x, y, x + w, y + 12};
+	window({x, y, x + window_width, y2}, false, false);
+	rect rh = {x, y, x + window_width, y + 12};
 	if(title) {
 		auto push_font = font;
 		font = metrics::h1;
@@ -998,7 +1016,7 @@ int	statistic::choose_frame(resource_s resource, const char* header, const char*
 					if(hot.key == MouseLeft && hot.pressed)
 						setfocus((int)focus, false);
 					if((hot.key == MouseLeft && !hot.pressed)
-						|| (focused && hot.key==KeyEnter))
+						|| (focused && hot.key == KeyEnter))
 						execute(set_num32, frame, &current);
 				}
 				if(current == frame) {
@@ -1066,23 +1084,59 @@ bool statistic::choose_ability(const char* header, const char* description, int 
 	return getresult();
 }
 
-int answers::choose(const char* title) const {
+static int show_picture(int x, int y, resource_s id, unsigned frame) {
+	auto ps = gres(id);
+	if(!ps)
+		return 0;
+	auto& f = ps->get(frame);
+	rect rc = {x, y, x + f.sx, y + f.sy};
+	auto mode = 1;
+	if(f.sx == 160 && f.encode == ps->RAW8) {
+		rc = {x, y, x + f.sx * 2, y + f.sy * 2};
+		mode = 2;
+	}
+	rc.offset(-gui_border);
+	draw::rectf(rc, colors::form, opacity_button);
+	if(mode==2) {
+		surface bm(f.sx, f.sy, 32);
+		auto push = canvas;
+		canvas = &bm;
+		image(0, 0, ps, 0, 0, 0);
+		canvas = push;
+		scale2x(ptr(x, y), canvas->scanline, bm.ptr(0, 0), bm.scanline, bm.width, bm.height);
+	} else
+		image(x, y, ps, frame, 0);
+	return rc.height();
+}
+
+const answers::element* answers::choosev(const char* title, const char* cancel_text, bool interactive, resource_s id, short unsigned frame) const {
+	int x, y;
+	if(!elements)
+		return 0;
 	openform();
 	while(ismodal()) {
 		render_main();
-		auto x = getwidth() - 320 - gui_border * 2;
-		auto y = gui_border * 2;
-		auto w = 320;
-		for(auto& e : elements) {
-			if(windowv(x, y, w, e.text, 0))
-				execute(breakparam, e.id);
+		right_dialog(x, y);
+		if(id)
+			y += show_picture(x, y, id, frame);
+		if(title) {
+			windowm(x, y, window_width, title);
 			y += metrics::padding;
+		}
+		for(auto& e : elements) {
+			if(windowv(x, y, window_width, e.text, 0))
+				execute(breakparam, (int)&e);
+			y += 2;
+		}
+		if(cancel_text) {
+			if(windowv(x, y, window_width, cancel_text, KeyEscape))
+				execute(breakparam, 0);
 		}
 		domodal();
 		control_standart();
 	}
 	closeform();
-	return getresult();
+	return (element*)getresult();
 }
 
 static void set_border() {

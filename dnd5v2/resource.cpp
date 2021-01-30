@@ -2,11 +2,11 @@
 
 BSDATA(resourcei) = {{},
 	{"dungeon", "area"},
-	{"characters", "creatures"},
-	{"gui", "interface"},
 	{"avatars", "interface"},
 	{"monsters", "interface"},
+	{"npc", "scenery"},
 };
+assert_enum(resourcei, ResNPC)
 
 void resourcei::geturl(stringbuilder& sb) const {
 	sb.add("art/");

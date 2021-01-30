@@ -108,7 +108,7 @@ enum range_s : unsigned char {
 	Touch, Range10, Range20, Range30, Range60, Range80, Range120,
 };
 enum duration_s : unsigned char {
-	Instantaneous, Concentration, BonusAction, Action,
+	Instantaneous, Concentration, BonusAction, StandartAction,
 	DurationRound, DurationMinute, Duration10Minute, DurationHour, DurationNight,
 };
 enum spell_s : unsigned char {
@@ -118,7 +118,7 @@ enum spell_s : unsigned char {
 };
 enum resource_s : unsigned char {
 	ResNone,
-	ResDungeon, ResCharacter, ResGUI, ResAvatars, ResMonsters,
+	ResDungeon, ResAvatars, ResMonsters, ResNPC,
 };
 enum uses_s : unsigned char {
 	ManyTimes, Recharge56, Recharge6, UntilShortRest, UntilLongRest
@@ -142,11 +142,12 @@ enum trait_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Ability, Alignment, Background, Class, Creature, DamageType, Domain, FightingStyle,
+	Ability, Action, Alignment, Background, Class, Creature, DamageType, Domain, FightingStyle,
 	Gender, Generate, Item, Language, Levelup, Menu, Modifier, Pack, Race, Save, School, Skill, Spell, Trait,
 };
 enum action_s : unsigned char {
-	ActionAmbush, ActionAttack, ActionDash,
+	ActionAmbush, ActionAttack, ActionDash, ActionDisengage,
+	ActionDodge, ActionHelp, ActionHide, ActionReady, ActionSearch, ActionUseItem,
 };
 const int grid_size = 64;
 typedef cflags<state_s> statef;
@@ -164,6 +165,7 @@ struct variant {
 	constexpr variant() : type(NoVariant), value(0) {}
 	constexpr variant(variant_s t, unsigned char v) : type(t), value(v) {}
 	constexpr variant(ability_s v) : variant(Ability, v) {}
+	constexpr variant(action_s v) : variant(Action, v) {}
 	constexpr variant(alignment_s v) : variant(Alignment, v) {}
 	constexpr variant(background_s v) : variant(Background, v) {}
 	constexpr variant(class_s v) : variant(Class, v) {}
@@ -420,6 +422,8 @@ public:
 	void				set(class_s v, int i) { classes[v] = i; }
 	void				set(state_s v) { state.add(v); }
 	void				set(trait_s v) { traits.set(v); }
+	void				uicombat();
+	bool				use(action_s id, bool run);
 };
 class answers {
 	char				buffer[2048];
@@ -433,19 +437,22 @@ public:
 	adat<element, 32>	elements;
 	void				add(int id, const char* name, ...) { addv(id, name, xva_start(name)); }
 	void				addv(int id, const char* name, const char* format);
-	int					choose(const char* title) const;
-	int					choose(const char* title, bool interactive) const;
+	const element*		choosev(const char* title, const char* cancel_text, bool interactive, resource_s id, short unsigned frame) const;
+	int					choose(const char* title, bool allow_cancel, bool interactive) const;
 	static int			compare(const void* v1, const void* v2);
 	int					random() const;
 	void				sort();
 };
 struct menu {
-	const char*			parent;
 	const char*			id;
-	fncommand			command;
+	const char*			parent;
+	fnevent				command;
 	fnvisible			visible;
 	const char*			name;
 	const char*			text;
+	static const menu*	choose(answers& aw, const char* name, bool allow_back = false);
+	static const menu*	choose(const char* name, bool allow_back = false);
+	static void			run(const char* name);
 };
 namespace draw {
 typedef void(*callback)();
@@ -457,6 +464,7 @@ void					startclient();
 }
 template<class T> const char* getinfo(const void* object, stringbuilder& sb) { return ((T*)object)->text; }
 int						distance(point p1, point p2);
+bool					dlgask(const char* format, ...);
 inline int				m2s(int v) { return v * grid_size; }
 inline point			m2s(point v) { return {v.x * (short)grid_size, v.y * (short)grid_size}; }
 inline short			s2m(int v) { return (v >= 0) ? v / grid_size : (v - grid_size) / grid_size; }

@@ -1,0 +1,10 @@
+﻿character: Персонажи. 
+connect: Присоединиться. 
+create_game: Создать игру. 
+disconnect: Отключиться. 
+game: Игра. 
+grafic: Графика. 
+network: Сетевые настройки. 
+reconnect: Присоединиться снова. 
+settings: Настройки. 
+user: Пользователь. 

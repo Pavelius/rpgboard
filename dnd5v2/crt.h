@@ -284,12 +284,14 @@ NOBSDATA(bool)
 typedef bool(*fnallow)(const void* object, int index);
 // Callback function of choosing one element from array of many elements and storing it into `pointer`
 typedef bool(*fnchoose)(const void* object, array& source, void* pointer);
-// Callback function of checking some functionality of `object`
-typedef bool(*fnvisible)(const void* object);
 // Callback funtion of object command executing
 typedef void(*fncommand)(void* object);
+// Typycal event callback
+typedef void(*fnevent)();
 // Callback function of source identification. Return property filled 'source'.
 typedef void(*fnsource)(const void* object, array& source);
+// Callback function of checking some functionality of `object`
+typedef bool(*fnvisible)(const void* object);
 // Requisit descriptor
 struct anyreq {
 	unsigned short					offset;

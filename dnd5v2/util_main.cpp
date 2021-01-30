@@ -194,21 +194,21 @@ static void create_geomorph() {
 	close_pma(p, ResDungeon);
 }
 
-static void create_sprites() {
-	static imageurl source[] = {
-		{"Dwarven_fighter_hammer_03"},
-		{"Cleric_Blue_48", {0,-8}},
-		{"Elf_Rogue_Bow", {0, -8}},
-	};
-	const auto count = sizeof(source) / sizeof(source[0]);
-	const char* surl0 = "D:/resources/topdown/creatures_f0";
-	auto p = create_pma(count * 2);
-	for(auto& e : source) {
-		add_png2(p, e.id, surl0, 0, 0, -1, -1, e.pos.x, e.pos.y);
-		//add_png(p, e.id, surl1);
-	}
-	close_pma(p, ResCharacter);
-}
+//static void create_sprites() {
+//	static imageurl source[] = {
+//		{"Dwarven_fighter_hammer_03"},
+//		{"Cleric_Blue_48", {0,-8}},
+//		{"Elf_Rogue_Bow", {0, -8}},
+//	};
+//	const auto count = sizeof(source) / sizeof(source[0]);
+//	const char* surl0 = "D:/resources/topdown/creatures_f0";
+//	auto p = create_pma(count * 2);
+//	for(auto& e : source) {
+//		add_png2(p, e.id, surl0, 0, 0, -1, -1, e.pos.x, e.pos.y);
+//		//add_png(p, e.id, surl1);
+//	}
+//	close_pma(p, ResCharacter);
+//}
 
 static void create_avatars() {
 	static const char* source[] = {
@@ -236,23 +236,23 @@ static void create_monsters() {
 	close_pma(p, ResMonsters);
 }
 
-static void create_gui() {
-	static const char* source[] = {
-		{"btn_narrow"},
-		{"btn_paper"},
-		{"btn_small"},
-	};
-	const auto count = sizeof(source) / sizeof(source[0]);
-	const char* surl0 = "D:/resources/gui";
-	auto p = create_pma(count*4);
-	for(auto id : source) {
-		add_png(p, id, "_off", surl0);
-		add_png(p, id, "_over", surl0);
-		add_png(p, id, "_down", surl0);
-		add_png(p, id, "_grey", surl0);
-	}
-	close_pma(p, ResGUI);
-}
+//static void create_gui() {
+//	static const char* source[] = {
+//		{"btn_narrow"},
+//		{"btn_paper"},
+//		{"btn_small"},
+//	};
+//	const auto count = sizeof(source) / sizeof(source[0]);
+//	const char* surl0 = "D:/resources/gui";
+//	auto p = create_pma(count*4);
+//	for(auto id : source) {
+//		add_png(p, id, "_off", surl0);
+//		add_png(p, id, "_over", surl0);
+//		add_png(p, id, "_down", surl0);
+//		add_png(p, id, "_grey", surl0);
+//	}
+//	close_pma(p, ResGUI);
+//}
 
 void tilei::exportdata() const {
 	char temp[260];
@@ -272,7 +272,7 @@ void tilei::exportdata() const {
 }
 
 void util_main() {
-	create_gui();
+	//create_gui();
 	//create_monsters();
 	//create_avatars();
 	//create_sprites();

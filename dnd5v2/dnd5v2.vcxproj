@@ -197,6 +197,7 @@
     <ClCompile Include="race.cpp" />
     <ClCompile Include="resource.cpp" />
     <ClCompile Include="save.cpp" />
+    <ClCompile Include="scale2x.c" />
     <ClCompile Include="school.cpp" />
     <ClCompile Include="skill.cpp" />
     <ClCompile Include="socket.cpp" />
@@ -223,6 +224,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\locale\ru\Ability.txt" />
+    <Text Include="..\locale\ru\Action.txt" />
     <Text Include="..\locale\ru\Alignment.txt" />
     <Text Include="..\locale\ru\Background.txt" />
     <Text Include="..\locale\ru\Class.txt" />
@@ -232,6 +234,7 @@
     <Text Include="..\locale\ru\Generate.txt" />
     <Text Include="..\locale\ru\Item.txt" />
     <Text Include="..\locale\ru\Levelup.txt" />
+    <Text Include="..\locale\ru\Menu.txt" />
     <Text Include="..\locale\ru\Race.txt" />
     <Text Include="..\locale\ru\School.txt" />
     <Text Include="..\locale\ru\Skill.txt" />

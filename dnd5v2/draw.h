@@ -29,7 +29,6 @@ enum draw_event_s {
 	Focused = 0x10000000, // Control has keyboard input and can change visual form.
 	Checked = 0x20000000, // Use in background virtual method.
 	Disabled = 0x40000000, // Control not grant any input.
-	FirstInput = InputSymbol,
 };
 enum window_flags {
 	WFResize = 0x0010,

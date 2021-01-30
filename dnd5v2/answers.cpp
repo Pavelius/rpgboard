@@ -9,7 +9,9 @@ answers::answers() : sc(buffer) {}
 void answers::addv(int id, const char* text, const char* format) {
 	auto p = elements.add();
 	p->id = id;
-	p->text = sc.get(); sc.addv(text, format); sc.addsz();
+	p->text = sc.get();
+	sc.addv(text, format);
+	sc.addsz();
 }
 
 void answers::sort() {
@@ -22,8 +24,9 @@ int	answers::random() const {
 	return elements.data[rand() % elements.count].id;
 }
 
-int answers::choose(const char* title, bool interactive) const {
-	if(interactive)
-		return choose(title);
-	return random();
+int	answers::choose(const char* title, bool allow_cancel, bool interactive) const {
+	auto r = choosev(title, allow_cancel ? "Îòìåíà" : 0, interactive, ResNone, 0);
+	if(!r)
+		return 0;
+	return r->id;
 }

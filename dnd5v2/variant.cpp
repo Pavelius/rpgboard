@@ -6,6 +6,7 @@
 
 BSDATA(varianti) = {{""},
 	{"Ability", META(abilityi), LOCMN(abilityi)},
+	{"Action", META(actioni), LOCMN(actioni)},
 	{"Alignment", META(alignmenti), LOCMN(alignmenti)},
 	{"Background", META(backgroundi), LOCMN(backgroundi)},
 	{"Class", META(classi), LOCMN(classi)},
