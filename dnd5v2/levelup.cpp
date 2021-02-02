@@ -182,9 +182,12 @@ void creaturei::apply(variant object, int level, bool interactive) {
 					}
 					source.add(e);
 				}
-				source.sort();
-				variant v1 = source.chooseg(ei.name, ei.text, i);
-				apply(v1, m);
+				if(interactive) {
+					source.sort();
+					variant v1 = source.chooseg(ei.name, ei.text, i);
+					apply(v1, m);
+				} else
+					apply(source.random(), m);
 			}
 		} else
 			apply(ei.source);

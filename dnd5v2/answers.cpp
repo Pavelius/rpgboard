@@ -25,7 +25,7 @@ int	answers::random() const {
 }
 
 int	answers::choose(const char* title, bool allow_cancel, bool interactive) const {
-	auto r = choosev(title, allow_cancel ? "Îòìåíà" : 0, interactive, ResNone, 0);
+	auto r = choosev(title, allow_cancel ? "Îòìåíà" : 0, interactive, ResNone, 0, 0, 0);
 	if(!r)
 		return 0;
 	return r->id;

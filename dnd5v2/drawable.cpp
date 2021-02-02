@@ -3,6 +3,8 @@
 
 BSDATAC(drawable, 32)
 
+bool drawable::change_position;
+
 void drawable::setframe(resource_s rid, int frame) {
 	this->rid = rid;
 	this->frame = frame;
@@ -20,4 +22,19 @@ void drawable::setmirrorv(bool v) {
 		flags |= ImageMirrorV;
 	else
 		flags &= ~ImageMirrorV;
+}
+
+void drawable::setposition(point v) {
+	if(x != v.x) {
+		x = v.x;
+		change_position = true;
+	}
+	if(y != v.y) {
+		y = v.y;
+		change_position = true;
+	}
+}
+
+bool drawable::ischangedposition(const void* object) {
+	return change_position;
 }

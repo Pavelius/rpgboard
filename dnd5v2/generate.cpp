@@ -12,7 +12,7 @@ BSDATA(generatei) = {
 assert_enum(generatei, ChooseRace)
 
 void creaturei::finish() {
-	//	setbase();
+	add(Speed, 6);
 }
 
 void creaturei::create(race_s race, class_s clas, gender_s gender) {
@@ -100,19 +100,6 @@ static int random_4d6() {
 	qsort(source, sizeof(source) / sizeof(source[0]), sizeof(source[0]), compare_best_ability);
 	return source[0] + source[1] + source[2];
 }
-
-//void creaturei::random_ability(class_s c) {
-//	for(auto i = Strenght; i <= Charisma; i = (ability_s)(i + 1))
-//		abilities[i] = (rand() % 6) + (rand() % 6) + (rand() % 6) + 3;
-//	auto maximum = Strenght; int maximum_value = abilities[Strenght];
-//	for(auto i = Strenght; i <= Charisma; i = (ability_s)(i + 1)) {
-//		if(abilities[i] > maximum_value) {
-//			maximum_value = abilities[i];
-//			maximum = i;
-//		}
-//	}
-//	iswap(abilities[maximum], abilities[bsdata<classi>::elements[c].ability]);
-//}
 
 void statistic::random_ability(class_s clas) {
 	char temp[6];

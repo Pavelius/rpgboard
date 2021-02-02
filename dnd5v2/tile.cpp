@@ -14,3 +14,7 @@ BSDATA(tilei) = {
 	{"cave_treasure2", 8},
 };
 BSDATAF(tilei)
+
+bool tilei::isblocked(tilei::indext i) const {
+	return (block[i / 8] & (1 << (i % 8))) != 0;
+}

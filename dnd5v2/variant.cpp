@@ -53,6 +53,12 @@ void* variant::getobject() const {
 	return e.source->ptr(value);
 }
 
+void* variant::getobject(variant_s t) const {
+	if(t != type)
+		return 0;
+	return getobject();
+}
+
 const char* variant::getname() const {
 	auto& e = bsdata<varianti>::elements[type];
 	if(!e.source || !e.locale[0])

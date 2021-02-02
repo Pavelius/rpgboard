@@ -3,8 +3,7 @@
 
 using namespace draw;
 
-namespace {
-struct focusable_element {
+struct focusablei {
 	int					id;
 	rect				rc;
 	operator bool() const { return id != 0; }
@@ -20,9 +19,8 @@ struct parami {
 			origin = 0;
 	}
 };
-}
-static focusable_element elements[96];
-static focusable_element* render_control;
+static focusablei elements[96];
+static focusablei* render_control;
 static int				current_focus;
 static bool				break_modal;
 static int				break_result;
@@ -47,6 +45,7 @@ const unsigned char		opacity_button = 220;
 const unsigned char		opacity_disabled = 50;
 const unsigned char		opacity_hilighted = 200;
 const int				tips_width = 200;
+const int				button_width = 320;
 const int				window_width = 320;
 const int				gui_border = 8;
 const int				gui_padding = 4;
@@ -104,7 +103,7 @@ static void closeform() {
 	hot.key = 0;
 }
 
-static focusable_element* getby(int id) {
+static focusablei* getby(int id) {
 	if(!id)
 		return 0;
 	for(auto& e : elements) {
@@ -116,7 +115,7 @@ static focusable_element* getby(int id) {
 	return 0;
 }
 
-static focusable_element* getfirst() {
+static focusablei* getfirst() {
 	for(auto& e : elements) {
 		if(!e)
 			return 0;
@@ -125,7 +124,7 @@ static focusable_element* getfirst() {
 	return 0;
 }
 
-static focusable_element* getlast() {
+static focusablei* getlast() {
 	auto p = elements;
 	for(auto& e : elements) {
 		if(!e)
@@ -133,6 +132,47 @@ static focusable_element* getlast() {
 		p = &e;
 	}
 	return p;
+}
+
+static bool window(rect rc, bool hilight = true, bool pressable = false, int border = 0) {
+	if(border == 0)
+		border = gui_border;
+	rc.offset(-border, -border);
+	auto op = opacity_button;
+	auto rs = area(rc);
+	if(hilight && rs) {
+		if(pressable && hot.pressed)
+			rc.offset(1, 1);
+		draw::rectf(rc, colors::button);
+	} else
+		draw::rectf(rc, colors::form, op);
+	draw::rectb(rc, colors::form);
+	return rs;
+}
+
+static void windowm(int x, int& y, int width, const char* title) {
+	auto border = gui_border;
+	rect rc = {x, y, x + width, y}; textf(rc, title);
+	if(rc.x2 < x + width)
+		rc.x2 = x + width;
+	auto hilited = window(rc, false, false, border);
+	textf(x, y, width, title);
+	y += rc.height() + border * 2;
+}
+
+static bool windowv(int x, int& y, int width, const char* title, unsigned key) {
+	auto border = gui_border;
+	rect rc = {x, y, x + width, y}; textw(rc, title);
+	if(rc.x2 < x + width)
+		rc.x2 = x + width;
+	rc.y2 += border;
+	auto hilited = window(rc, true, true, border);
+	auto result = hilited && hot.key == MouseLeft && !hot.pressed;
+	if(key && !result && hot.key == key)
+		result = true;
+	text(rc, title, AlignCenterCenter);
+	y += rc.height() + border * 2;
+	return result;
 }
 
 void draw::addelement(int id, const rect& rc) {
@@ -234,57 +274,16 @@ int draw::getresult() {
 	return break_result;
 }
 
-static bool window(rect rc, bool hilight = true, bool pressable = false, int border = 0) {
-	if(border == 0)
-		border = gui_border;
-	rc.offset(-border, -border);
-	auto op = opacity_button;
-	auto rs = area(rc);
-	if(hilight && rs) {
-		if(pressable && hot.pressed)
-			rc.offset(1, 1);
-		draw::rectf(rc, colors::button);
-	} else
-		draw::rectf(rc, colors::form, op);
-	draw::rectb(rc, colors::form);
-	return rs;
-}
-
-static void windowm(int x, int& y, int width, const char* title) {
-	auto border = gui_border;
-	rect rc = {x, y, x + width, y}; textf(rc, title);
-	if(rc.x2 < x + width)
-		rc.x2 = x + width;
-	//rc.y2 += border;
-	auto hilited = window(rc, false, false, border);
-	textf(x, y, width, title);
-	y += rc.height() + border * 2;
-}
-
-static bool windowv(int x, int& y, int width, const char* title, unsigned key) {
-	auto border = gui_border;
-	rect rc = {x, y, x + width, y}; textw(rc, title);
-	if(rc.x2 < x + width)
-		rc.x2 = x + width;
-	rc.y2 += border;
-	auto hilited = window(rc, true, true, border);
-	auto result = hilited && hot.key == MouseLeft && !hot.pressed;
-	if(key && !result && hot.key == key)
-		result = true;
-	text(rc, title, AlignCenterCenter);
-	y += rc.height() + border * 2;
-	return result;
-}
-
-static void tooltips(int x, int y, int width, const char* format, ...) {
+static void tooltips(int x, int y, int width, const char* format, const char* format_param) {
 	tooltips_point.x = x;
 	tooltips_point.y = y;
 	tooltips_width = width;
 	stringbuilder sb(tooltips_text);
-	sb.addv(format, xva_start(format));
+	sb.addv(format, format_param);
 }
 
 static void tooltips(const char* format, ...) {
+	tooltips(hot.mouse.x, hot.mouse.y, window_width, format, xva_start(format));
 }
 
 static bool isfocused(const rect& rc, const void* value) {
@@ -480,7 +479,7 @@ static int render_text(int x, int y, int width, const char* string) {
 	draw::link[0] = 0;
 	auto result = textf(x, y, width, string);
 	if(draw::link[0])
-		tooltips(x, y, width, draw::link);
+		tooltips(x, y, width, draw::link, 0);
 	return result;
 }
 
@@ -1097,6 +1096,7 @@ static int show_picture(int x, int y, resource_s id, unsigned frame) {
 	}
 	rc.offset(-gui_border);
 	draw::rectf(rc, colors::form, opacity_button);
+	draw::rectb(rc, colors::form);
 	if(mode==2) {
 		surface bm(f.sx, f.sy, 32);
 		auto push = canvas;
@@ -1109,7 +1109,7 @@ static int show_picture(int x, int y, resource_s id, unsigned frame) {
 	return rc.height();
 }
 
-const answers::element* answers::choosev(const char* title, const char* cancel_text, bool interactive, resource_s id, short unsigned frame) const {
+const answers::element* answers::choosev(const char* title, const char* cancel_text, bool interactive, resource_s id, short unsigned frame, fnvisible allow, const void* object) const {
 	int x, y;
 	if(!elements)
 		return 0;
@@ -1123,15 +1123,18 @@ const answers::element* answers::choosev(const char* title, const char* cancel_t
 			windowm(x, y, window_width, title);
 			y += metrics::padding;
 		}
+		x = getwidth() - button_width - gui_border * 2;
 		for(auto& e : elements) {
-			if(windowv(x, y, window_width, e.text, 0))
+			if(windowv(x, y, button_width, e.text, 0))
 				execute(breakparam, (int)&e);
 			y += 2;
 		}
 		if(cancel_text) {
-			if(windowv(x, y, window_width, cancel_text, KeyEscape))
+			if(windowv(x, y, button_width, cancel_text, KeyEscape))
 				execute(breakparam, 0);
 		}
+		if(allow && allow(object))
+			execute(breakparam, 0);
 		domodal();
 		control_standart();
 	}

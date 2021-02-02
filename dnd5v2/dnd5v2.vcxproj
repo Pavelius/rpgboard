@@ -171,6 +171,7 @@
     <ClCompile Include="converter.cpp" />
     <ClCompile Include="domain.cpp" />
     <ClCompile Include="fighting.cpp" />
+    <ClCompile Include="game.cpp" />
     <ClCompile Include="gender.cpp" />
     <ClCompile Include="form.cpp" />
     <ClCompile Include="generate.cpp" />
@@ -192,6 +193,7 @@
     <ClCompile Include="nameable.cpp" />
     <ClCompile Include="network.cpp" />
     <ClCompile Include="pack.cpp" />
+    <ClCompile Include="pathfind.cpp" />
     <ClCompile Include="png.cpp" />
     <ClCompile Include="point.cpp" />
     <ClCompile Include="race.cpp" />

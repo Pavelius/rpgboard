@@ -51,11 +51,81 @@ void variantc::match(variant v, bool keep) {
 	auto p = data;
 	for(auto e : *this) {
 		auto result = false;
-		if(e.type == Race)
-			result = variant(bsdata<racei>::elements[e.value].base) == v;
+		switch(e.type) {
+		case Race: result = variant(bsdata<racei>::elements[e.value].base) == v; break;
+		}
 		if(result != keep)
 			continue;
 		*p++ = e;
 	}
 	count = p - data;
+}
+
+void variantc::match(state_s v, bool keep) {
+	auto p = data;
+	for(auto e : *this) {
+		auto result = false;
+		switch(e.type) {
+		case Creature:
+			result = bsdata<creaturei>::elements[e.value].is(v);
+			break;
+		default: continue;
+		}
+		if(result != keep)
+			continue;
+		*p++ = e;
+	}
+	count = p - data;
+}
+
+void variantc::match(action_s v, bool keep) {
+	auto p = data;
+	for(auto e : *this) {
+		auto result = false;
+		switch(e.type) {
+		case Creature:
+			result = bsdata<creaturei>::elements[e.value].is(v);
+			break;
+		default: continue;
+		}
+		if(result != keep)
+			continue;
+		*p++ = e;
+	}
+	count = p - data;
+}
+
+static unsigned distancef(point p1, point p2) {
+	auto dx = iabs(p1.x - p2.x);
+	auto dy = iabs(p1.y - p2.y);
+	return dx > dy ? dx : dy;
+}
+
+void variantc::range(point start, unsigned v, bool keep) {
+	auto p = data;
+	for(auto e : *this) {
+		point pt;
+		switch(e.type) {
+		case Creature:
+			pt.x = bsdata<creaturei>::elements[e.value].x;
+			pt.y = bsdata<creaturei>::elements[e.value].y;
+			break;
+		default:
+			continue;
+		}
+		auto result = distancef(start, pt) <= v;
+		if(result != keep)
+			continue;
+		*p++ = e;
+	}
+	count = p - data;
+}
+
+variant	variantc::choose(const char* title) const {
+	if(getcount() == 1)
+		return data[0];
+	answers aw;
+	for(auto v : *this)
+		aw.add(v, v.getname());
+	return aw.choose(title, false, true);
 }

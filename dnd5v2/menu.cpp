@@ -12,6 +12,7 @@ BSDATA(menu) = {
 	{"network", "settings"},
 	{"grafic", "settings", },
 	{"user", "settings"},
+	{"game", "settings"},
 	{"create_game", "game"},
 	{"connect", "game"},
 	{"disconnect", "game", disonnect_game},
@@ -21,17 +22,18 @@ BSDATAF(menu)
 
 const menu* menu::choose(const char* name, bool allow_back) {
 	answers aw;
-	return choose(aw, name, allow_back);
+	select(aw, name);
+	auto p = aw.choosev(0, allow_back ? "Отмена" : 0, true, ResNone, 0, 0, 0);
+	if(!p)
+		return 0;
+	return (menu*)p->id;
 }
 
-const menu* menu::choose(answers& aw, const char* name, bool allow_back) {
+void menu::select(answers& aw, const char* name) {
 	for(auto& e : bsdata<menu>()) {
 		if(strcmp(e.parent, name) == 0)
 			aw.add((int)&e, e.name);
 	}
-	if(!aw.elements)
-		return 0;
-	return (menu*)aw.choose(0, allow_back, true);
 }
 
 void menu::run(const char* parent) {
@@ -48,7 +50,7 @@ void menu::run(const char* parent) {
 static bool dlgaskv(const char* format) {
 	answers aw;
 	aw.add(1, "Да");
-	auto p = aw.choosev(format, "Нет", true, ResNPC, 10);
+	auto p = aw.choosev(format, "Нет", true, ResNPC, 10, 0, 0);
 	if(!p)
 		return false;
 	return true;

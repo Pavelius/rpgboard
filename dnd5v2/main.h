@@ -92,9 +92,11 @@ enum alignment_s : unsigned char {
 };
 enum ability_s : unsigned char {
 	Strenght, Dexterity, Constitution, Intellegence, Wisdow, Charisma,
-	HitPoints, Speed,
+	HitPoints, Speed, Movement,
 	Attack, MeleeAttack, MissileAttack, Damage, MeleeDamage, MissileDamage,
+	ArmorClass, ArmorReduction,
 	ActionSurgeSlot, ChannelDivinitySlot, SecondWindSlot,
+	StandartActionSlot, BonusActionSlot,
 	Spell1, Spell2, Spell3, Spell4, Spell5, Spell6, Spell7, Spell8, Spell9,
 };
 enum gender_s : unsigned char {
@@ -123,12 +125,12 @@ enum resource_s : unsigned char {
 enum uses_s : unsigned char {
 	ManyTimes, Recharge56, Recharge6, UntilShortRest, UntilLongRest
 };
-//enum direction_s : unsigned char {
-//	Center,
-//	Up, UpRight, Right, DownRight, Down, DownLeft, Left, UpLeft,
-//};
+enum direction_s : unsigned char {
+	Center,
+	Up, UpRight, Right, DownRight, Down, DownLeft, Left, UpLeft,
+};
 enum state_s : unsigned char {
-	Hostile,
+	Active, Hostile,
 };
 enum save_s : unsigned char {
 	SaveVsStrenght, SaveVsDexterity, SaveVsConstitution, SaveVsIntellegence, SaveVsWisdow, SaveVsCharisma,
@@ -146,10 +148,13 @@ enum variant_s : unsigned char {
 	Gender, Generate, Item, Language, Levelup, Menu, Modifier, Pack, Race, Save, School, Skill, Spell, Trait,
 };
 enum action_s : unsigned char {
+	ActionEndTurn,
 	ActionAmbush, ActionAttack, ActionDash, ActionDisengage,
-	ActionDodge, ActionHelp, ActionHide, ActionReady, ActionSearch, ActionUseItem,
+	ActionDodge, ActionFeint, ActionHide, ActionReady, ActionSearch, ActionUseItem,
 };
 const int grid_size = 64;
+class creaturei;
+typedef cflags<action_s> actionf;
 typedef cflags<state_s> statef;
 typedef flagable<Material> tagf;
 typedef flagable<TwoWeaponFighting> fightstylef;
@@ -189,8 +194,24 @@ struct variant {
 	const char*			getinfo(stringbuilder& sb) const;
 	const char*			getname() const;
 	void*				getobject() const;
+	void*				getobject(variant_s t) const;
+	creaturei*			getcreature() const { return (creaturei*)getobject(Creature); }
 };
 typedef std::initializer_list<variant> varianta;
+struct variantc : adat<variant> {
+	variantc() = default;
+	variantc(const array& v) { select(v); }
+	void				exclude(variant v);
+	variant				choose(const char* title) const;
+	variant				chooseg(const char* step, const char* title, int score = 0) const;
+	void				match(action_s v, bool keep);
+	void				match(state_s v, bool keep);
+	void				match(variant v1, bool keep);
+	void				matchbs(bool keep);
+	void				range(point start, unsigned v, bool keep);
+	void				select(const array& source);
+	void				sort();
+};
 struct varianti {
 	const char*			id;
 	array*				source;
@@ -200,16 +221,6 @@ struct varianti {
 	const char*			name;
 	const char*			text;
 	static void			localization(const char* locale, bool writemode);
-};
-struct variantc : adat<variant> {
-	variantc() = default;
-	variantc(const array& v) { select(v); }
-	void				exclude(variant v);
-	variant				chooseg(const char* step, const char* title, int score = 0) const;
-	void				match(variant v1, bool keep);
-	void				matchbs(bool keep);
-	void				select(const array& source);
-	void				sort();
 };
 struct fighting_stylei {
 	const char*			id;
@@ -349,30 +360,31 @@ struct resourcei {
 	bool				error;
 	void				geturl(stringbuilder& sb) const;
 };
-struct actioni {
-	const char*			id;
-	duration_s			duration;
-	const char*			name;
-	const char*			text;
-};
 struct tilei {
+	typedef unsigned char indext;
 	const char*			id;
 	unsigned char		size;
 	unsigned char		block[8 * 8];
 	void				edit();
 	void				exportdata() const;
+	bool				isblocked(tilei::indext i) const;
+	static indext		gi(int x, int y) { return y * 8 + x; }
+	static int			gx(indext i) { return i / 8; }
+	static int			gy(indext i) { return i % 8; }
 };
 class drawable : public point {
 	resource_s			rid;
 	unsigned short		frame;
 	unsigned short		flags;
 public:
+	static bool			change_position;
 	void				clear() { memset(this, 0, sizeof(*this)); }
+	static bool			ischangedposition(const void* object);
 	void				paint(int x, int y, bool allow_select) const;
 	void				setframe(resource_s r, int frame);
 	void				setmirrorh(bool v);
 	void				setmirrorv(bool v);
-	void				setposition(point v) { *static_cast<point*>(this) = v; }
+	void				setposition(point v);
 };
 struct damagei {
 	const char*			id;
@@ -395,10 +407,15 @@ struct statistic {
 	int					getabilityscores() const;
 	void				random_ability(class_s clas);
 };
-class creaturei : public drawable, public nameablei, public statistic {
+struct rollstati {
+	int					r1, r2;
+	int					dc;
+};
+class creaturei : public statistic, public drawable, public nameablei {
 	unsigned char		classes[Rogue + 1];
 	statistic			base;
 	statef				state;
+	actionf				actions;
 	spellf				spells_known;
 	itemf				spells_focus;
 	alignment_s			alignment;
@@ -409,21 +426,39 @@ class creaturei : public drawable, public nameablei, public statistic {
 	void				finish();
 	bool				have(variant v, modifier_s modifier) const;
 public:
+	void				add(ability_s v, int i) { set(v, get(v) + i); }
+	void				aftercombatround();
+	bool				attack(creaturei* target, int bonus, int advantages);
+	void				beforecombatround();
 	void				clear() { memset(this, 0, sizeof(*this)); }
 	void				create(race_s race, class_s clas, gender_s gender);
+	bool				feint(creaturei* target, bool run);
+	int					get(ability_s v) const { return abilities[v]; }
 	bool				generate(bool interactive);
 	alignment_s			getalignment() const { return alignment; }
+	bool				is(action_s v) const { return actions.is(v); }
 	bool				is(trait_s v) const { return traits.is(v); }
 	bool				is(state_s v) const { return state.is(v); }
 	bool				isfocus(item_s v) { return spells_focus.is(v); }
 	bool				isproficiency(item_s v) const { return items_proficiency.is(v); }
+	bool				isreadytohide() const;
 	void				paint(int x0, int y0, bool allow_drag, bool allow_click) const;
 	void				remove(trait_s v) { traits.remove(v); }
+	int					roll(int advantages) const;
+	static int			roll20(bool halfling_luck);
+	void				set(ability_s v, int i) { abilities[v] = i; }
+	void				set(action_s v) { actions.add(v); }
 	void				set(class_s v, int i) { classes[v] = i; }
 	void				set(state_s v) { state.add(v); }
 	void				set(trait_s v) { traits.set(v); }
 	void				uicombat();
 	bool				use(action_s id, bool run);
+};
+struct actioni {
+	const char*			id;
+	duration_s			duration;
+	const char*			text;
+	const char*			name;
 };
 class answers {
 	char				buffer[2048];
@@ -437,7 +472,7 @@ public:
 	adat<element, 32>	elements;
 	void				add(int id, const char* name, ...) { addv(id, name, xva_start(name)); }
 	void				addv(int id, const char* name, const char* format);
-	const element*		choosev(const char* title, const char* cancel_text, bool interactive, resource_s id, short unsigned frame) const;
+	const element*		choosev(const char* title, const char* cancel_text, bool interactive, resource_s id, short unsigned frame, fnvisible allow, const void* object) const;
 	int					choose(const char* title, bool allow_cancel, bool interactive) const;
 	static int			compare(const void* v1, const void* v2);
 	int					random() const;
@@ -450,9 +485,12 @@ struct menu {
 	fnvisible			visible;
 	const char*			name;
 	const char*			text;
-	static const menu*	choose(answers& aw, const char* name, bool allow_back = false);
 	static const menu*	choose(const char* name, bool allow_back = false);
 	static void			run(const char* name);
+	static void			select(answers& aw, const char* name);
+};
+struct gamei {
+	void				combat();
 };
 namespace draw {
 typedef void(*callback)();
@@ -465,6 +503,7 @@ void					startclient();
 template<class T> const char* getinfo(const void* object, stringbuilder& sb) { return ((T*)object)->text; }
 int						distance(point p1, point p2);
 bool					dlgask(const char* format, ...);
+extern gamei			game;
 inline int				m2s(int v) { return v * grid_size; }
 inline point			m2s(point v) { return {v.x * (short)grid_size, v.y * (short)grid_size}; }
 inline short			s2m(int v) { return (v >= 0) ? v / grid_size : (v - grid_size) / grid_size; }
