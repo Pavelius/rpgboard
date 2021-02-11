@@ -857,12 +857,8 @@ static void right_panel(int& x, int& y, const char* title, bool cancel_button) {
 	auto y2 = getheight() - gui_border * 2;
 	window({x, y, x + window_width, y2}, false, false);
 	rect rh = {x, y, x + window_width, y + 12};
-	if(title) {
-		auto push_font = font;
-		font = metrics::h1;
-		draw::text(rh.x1, rh.y1, title);
-		font = push_font;
-	}
+	if(title)
+		y += textf(rh.x1, rh.y1, window_width, title) + metrics::padding;
 	if(cancel_button) {
 		rect rc;
 		rc.x1 = getwidth() - gui_border * 2 - 16;
@@ -989,22 +985,25 @@ int	statistic::choose_frame(resource_s resource, const char* header, const char*
 	openform();
 	while(ismodal()) {
 		render_main();
-		dialog(x, y, header, description);
+		right_panel(x, y, description, true);
 		auto x1 = x, y0 = y;
 		x += metrics::padding * 2;
-		const auto w = dialog_w;
-		auto mx = dialog_w / size.x;
-		auto my = dialog_h / size.y;
-		for(auto ty = 0; ty < my; ty++) {
+		const auto w = window_width;
+		auto mx = w / size.x;
+		auto my = w / size.y;
+		auto ty = 0;
+		while(true) {
+			rect rc;
+			rc.y1 = y + ty * size.y;
+			rc.y2 = rc.y1 + size.y - 1;
+			if(rc.y1 > getheight() - texth() * 3)
+				break;
 			for(auto tx = 0; tx < mx; tx++) {
 				auto frame = ty * mx + tx;
 				if(frame >= ps->count)
 					break;
-				rect rc;
 				rc.x1 = x + tx * size.x;
-				rc.y1 = y + ty * size.y;
 				rc.x2 = rc.x1 + size.x - 1;
-				rc.y2 = rc.y1 + size.y - 1;
 				auto focus = &ps->get(frame);
 				auto focused = isfocused(rc, focus);
 				if(area(rc)) {
@@ -1016,12 +1015,13 @@ int	statistic::choose_frame(resource_s resource, const char* header, const char*
 						setfocus((int)focus, false);
 					if((hot.key == MouseLeft && !hot.pressed)
 						|| (focused && hot.key == KeyEnter))
-						execute(set_num32, frame, &current);
+						//execute(set_num32, frame, &current);
+						execute(breakparam, frame);
 				}
-				if(current == frame) {
-					rectb(rc, colors::active);
-					rectb({rc.x1 + 1, rc.y1 + 1, rc.x2 - 1, rc.y2 - 1}, colors::active);
-				}
+				//if(current == frame) {
+				//	rectb(rc, colors::active);
+				//	rectb({rc.x1 + 1, rc.y1 + 1, rc.x2 - 1, rc.y2 - 1}, colors::active);
+				//}
 				if(focused) {
 					auto r1 = rc;
 					r1.offset(2, 2);
@@ -1029,12 +1029,8 @@ int	statistic::choose_frame(resource_s resource, const char* header, const char*
 				}
 				image(rc.x1 + size.x / 2, rc.y1 + size.y / 2, ps, frame, 0);
 			}
+			ty++;
 		}
-		footer(x, y);
-		if(button(x, y, 100, "OK", "OK", KeyEnter))
-			execute(buttonparam, current);
-		if(button(x, y, 100, "Cancel", "Cancel", KeyEscape))
-			execute(buttonparam, -1);
 		domodal();
 		if(control_dialog())
 			continue;

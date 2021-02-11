@@ -184,7 +184,7 @@ void creaturei::apply(variant object, int level, bool interactive) {
 				}
 				if(interactive) {
 					source.sort();
-					variant v1 = source.chooseg(ei.name, ei.text, i);
+					variant v1 = source.choose(ei.text);
 					apply(v1, m);
 				} else
 					apply(source.random(), m);

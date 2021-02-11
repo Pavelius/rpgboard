@@ -202,7 +202,7 @@ struct variantc : adat<variant> {
 	variantc() = default;
 	variantc(const array& v) { select(v); }
 	void				exclude(variant v);
-	variant				choose(const char* title) const;
+	variant				choose(const char* title, int score = 0) const;
 	variant				chooseg(const char* step, const char* title, int score = 0) const;
 	void				match(action_s v, bool keep);
 	void				match(state_s v, bool keep);
@@ -367,10 +367,10 @@ struct tilei {
 	unsigned char		block[8 * 8];
 	void				edit();
 	void				exportdata() const;
-	bool				isblocked(tilei::indext i) const;
 	static indext		gi(int x, int y) { return y * 8 + x; }
 	static int			gx(indext i) { return i / 8; }
 	static int			gy(indext i) { return i % 8; }
+	bool				isblocked(indext i) const;
 };
 class drawable : public point {
 	resource_s			rid;
@@ -380,6 +380,7 @@ public:
 	static bool			change_position;
 	void				clear() { memset(this, 0, sizeof(*this)); }
 	static bool			ischangedposition(const void* object);
+	bool				isblocked(int x, int y) const;
 	void				paint(int x, int y, bool allow_select) const;
 	void				setframe(resource_s r, int frame);
 	void				setmirrorh(bool v);

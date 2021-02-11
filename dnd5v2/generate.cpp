@@ -36,7 +36,8 @@ static variant choose_step(variantc& source, generate_s id, bool interactive, bo
 	sb.add(".");
 	if(sort)
 		source.sort();
-	variant v1 = source.chooseg(temp, bsdata<generatei>::elements[id].text);
+	//variant v1 = source.chooseg(temp, bsdata<generatei>::elements[id].text);
+	variant v1 = source.choose(bsdata<generatei>::elements[id].text);
 	source.clear();
 	return v1;
 }

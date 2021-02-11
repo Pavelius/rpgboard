@@ -121,7 +121,7 @@ void variantc::range(point start, unsigned v, bool keep) {
 	count = p - data;
 }
 
-variant	variantc::choose(const char* title) const {
+variant	variantc::choose(const char* title, int score) const {
 	if(getcount() == 1)
 		return data[0];
 	answers aw;

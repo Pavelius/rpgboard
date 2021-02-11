@@ -70,6 +70,7 @@ int main(int argc, char* argv[]) {
 	util_main();
 	draw::initialize();
 	auto p = test_characters();
+	add_character();
 	p->beforecombatround();
 	game.combat();
 	//add_character();

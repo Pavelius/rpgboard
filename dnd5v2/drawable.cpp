@@ -38,3 +38,9 @@ void drawable::setposition(point v) {
 bool drawable::ischangedposition(const void* object) {
 	return change_position;
 }
+
+bool drawable::isblocked(int px, int py) const {
+	auto x = px - this->x;
+	auto y = py - this->y;
+	return false;
+}
