@@ -23,7 +23,7 @@ BSDATAF(menu)
 const menu* menu::choose(const char* name, bool allow_back) {
 	answers aw;
 	select(aw, name);
-	auto p = aw.choosev(0, allow_back ? "Отмена" : 0, true, ResNone, 0, 0, 0);
+	auto p = aw.choosev(0, allow_back ? "Отмена" : 0, true, ResNone, 0, 0, 0, 0);
 	if(!p)
 		return 0;
 	return (menu*)p->id;
@@ -50,7 +50,7 @@ void menu::run(const char* parent) {
 static bool dlgaskv(const char* format) {
 	answers aw;
 	aw.add(1, "Да");
-	auto p = aw.choosev(format, "Нет", true, ResNPC, 10, 0, 0);
+	auto p = aw.choosev(format, "Нет", true, ResNPC, 10, 0, 0, 0);
 	if(!p)
 		return false;
 	return true;

@@ -24,8 +24,8 @@ int	answers::random() const {
 	return elements.data[rand() % elements.count].id;
 }
 
-int	answers::choose(const char* title, bool allow_cancel, bool interactive) const {
-	auto r = choosev(title, allow_cancel ? "Îòìåíà" : 0, interactive, ResNone, 0, 0, 0);
+int	answers::choose(const char* title, bool allow_cancel, bool interactive, fntext tips) const {
+	auto r = choosev(title, allow_cancel ? "Îòìåíà" : 0, interactive, ResNone, 0, 0, 0, tips);
 	if(!r)
 		return 0;
 	return r->id;

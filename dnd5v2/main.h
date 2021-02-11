@@ -179,16 +179,15 @@ struct variant {
 	constexpr variant(item_s v) : variant(Item, v) {}
 	constexpr variant(language_s v) : variant(Language, v) {}
 	constexpr variant(modifier_s v) : variant(Modifier, v) {}
+	constexpr variant(pack_s v) : variant(Pack, v) {}
 	constexpr variant(race_s v) : variant(Race, v) {}
 	constexpr variant(save_s v) : variant(Save, v) {}
 	constexpr variant(school_s v) : variant(School, v) {}
 	constexpr variant(skill_s v) : variant(Skill, v) {}
 	constexpr variant(spell_s v) : variant(Spell, v) {}
 	constexpr variant(trait_s v) : variant(Trait, v) {}
-	constexpr variant(int v) : variant(variant_s(v >> 8), v & 0xFF) {}
 	variant(const void* v);
 	constexpr explicit operator bool() const { return type != NoVariant; }
-	constexpr operator int() const { return (type << 8) | value; }
 	constexpr bool operator==(const variant& v) const { return v.type == type && v.value == value; }
 	constexpr bool operator!=(const variant& v) const { return (v.type != type) || (v.value != value); }
 	const char*			getinfo(stringbuilder& sb) const;
@@ -204,6 +203,7 @@ struct variantc : adat<variant> {
 	void				exclude(variant v);
 	variant				choose(const char* title, int score = 0) const;
 	variant				chooseg(const char* step, const char* title, int score = 0) const;
+	variant				choosev(const char* title, const char* cancel_text, bool interactive, resource_s id, short unsigned frame, fnvisible allow, const void* object, fntext tips) const;
 	void				match(action_s v, bool keep);
 	void				match(state_s v, bool keep);
 	void				match(variant v1, bool keep);
@@ -473,8 +473,8 @@ public:
 	adat<element, 32>	elements;
 	void				add(int id, const char* name, ...) { addv(id, name, xva_start(name)); }
 	void				addv(int id, const char* name, const char* format);
-	const element*		choosev(const char* title, const char* cancel_text, bool interactive, resource_s id, short unsigned frame, fnvisible allow, const void* object) const;
-	int					choose(const char* title, bool allow_cancel, bool interactive) const;
+	const element*		choosev(const char* title, const char* cancel_text, bool interactive, resource_s id, short unsigned frame, fnvisible allow, const void* object, fntext tips) const;
+	int					choose(const char* title, bool allow_cancel, bool interactive, fntext tips = 0) const;
 	static int			compare(const void* v1, const void* v2);
 	int					random() const;
 	void				sort();
@@ -502,6 +502,7 @@ namespace io {
 void					startclient();
 }
 template<class T> const char* getinfo(const void* object, stringbuilder& sb) { return ((T*)object)->text; }
+template<> const char* getinfo<racei>(const void* object, stringbuilder& sb);
 int						distance(point p1, point p2);
 bool					dlgask(const char* format, ...);
 extern gamei			game;

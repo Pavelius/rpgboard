@@ -176,6 +176,7 @@
     <ClCompile Include="form.cpp" />
     <ClCompile Include="generate.cpp" />
     <ClCompile Include="crt_locale.cpp" />
+    <ClCompile Include="getinfo.cpp" />
     <ClCompile Include="language.cpp" />
     <ClCompile Include="levelup.cpp" />
     <ClCompile Include="crt.cpp" />

@@ -121,11 +121,22 @@ void variantc::range(point start, unsigned v, bool keep) {
 	count = p - data;
 }
 
+static const char* tips_variant(const void* object, stringbuilder& sb) {
+	auto pv = (variant*)object;
+	return pv->getinfo(sb);
+}
+
 variant	variantc::choose(const char* title, int score) const {
 	if(getcount() == 1)
 		return data[0];
 	answers aw;
-	for(auto v : *this)
-		aw.add(v, v.getname());
-	return aw.choose(title, false, true);
+	for(auto v : *this) {
+		int i;
+		*((variant*)&i) = v;
+		aw.add(i, v.getname());
+	}
+	auto result = aw.choose(title, false, true, tips_variant);
+	if(!result)
+		return variant();
+	return *((variant*)&result);
 }

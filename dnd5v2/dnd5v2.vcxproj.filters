@@ -254,6 +254,9 @@
     <ClCompile Include="pathfind.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="getinfo.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint">

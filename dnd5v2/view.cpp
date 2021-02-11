@@ -44,7 +44,7 @@ const auto				dialog_h = 480;
 const unsigned char		opacity_button = 220;
 const unsigned char		opacity_disabled = 50;
 const unsigned char		opacity_hilighted = 200;
-const int				tips_width = 200;
+const int				tips_width = 400;
 const int				button_width = 320;
 const int				window_width = 320;
 const int				gui_border = 8;
@@ -160,13 +160,15 @@ static void windowm(int x, int& y, int width, const char* title) {
 	y += rc.height() + border * 2;
 }
 
-static bool windowv(int x, int& y, int width, const char* title, unsigned key) {
+static bool windowv(int x, int& y, int width, const char* title, unsigned key, bool* ptips = 0) {
 	auto border = gui_border;
 	rect rc = {x, y, x + width, y}; textw(rc, title);
 	if(rc.x2 < x + width)
 		rc.x2 = x + width;
 	rc.y2 += border;
 	auto hilited = window(rc, true, true, border);
+	if(ptips)
+		*ptips = hilited;
 	auto result = hilited && hot.key == MouseLeft && !hot.pressed;
 	if(key && !result && hot.key == key)
 		result = true;
@@ -280,6 +282,10 @@ static void tooltips(int x, int y, int width, const char* format, const char* fo
 	tooltips_width = width;
 	stringbuilder sb(tooltips_text);
 	sb.addv(format, format_param);
+}
+
+static void tooltips(int x, int y, const char* format, ...) {
+	tooltips(x, y, window_width, format, xva_start(format));
 }
 
 static void tooltips(const char* format, ...) {
@@ -551,9 +557,9 @@ static void render_tooltips(const char* format, int x, int y, int w) {
 	int height = draw::getheight();
 	int width = draw::getwidth();
 	if(rc.y2 >= height)
-		rc.move(0, height - 2 - rc.y2);
+		rc.move(0, height - gui_border - gui_padding - rc.y2);
 	if(rc.x2 >= width)
-		rc.move(width - 2 - rc.x2, 0);
+		rc.move(width - gui_padding - rc.x2, 0);
 	window(rc, false);
 	draw::fore = colors::tips::text;
 	draw::textf(rc.x1, rc.y1, rc.width(), format);
@@ -806,7 +812,7 @@ static void render_description(int x, int y, int w) {
 }
 
 static void set_info() {
-	current_info = hot.param;
+	current_info = *((variant*)&hot.param);
 }
 
 static void render_left(int x, int y, int w, int v) {
@@ -917,37 +923,37 @@ void choose_elements() {
 	choose_element("Test", 0, source, 2, test_name, 0);
 }
 
-variant variantc::chooseg(const char* header, const char* description, int score) const {
-	int x, y;
-	openform();
-	if(*this)
-		current_info = data[0];
-	while(ismodal()) {
-		render_main();
-		dialog(x, y, header, description);
-		auto x1 = x, y0 = y;
-		x += metrics::padding * 2;
-		const auto w2 = 180;
-		for(auto& e : *this) {
-			auto checked = (e == current_info);
-			if(radio(x, y, w2, e.getname(), &e, checked, 0))
-				execute(set_info, e);
-		}
-		render_left(x1, y, w2, score);
-		render_description(x + w2 + metrics::padding * 2, y0, dialog_w - w2 - (x - x1) - metrics::padding * 2);
-		footer(x, y);
-		if(button(x, y, 100, "OK", 0, KeyEnter))
-			execute(buttonparam, current_info);
-		if(button(x, y, 100, "Cancel", 0, KeyEscape))
-			execute(buttonparam, 0);
-		domodal();
-		if(control_dialog())
-			continue;
-		control_standart();
-	}
-	closeform();
-	return getresult();
-}
+//variant variantc::chooseg(const char* header, const char* description, int score) const {
+//	int x, y;
+//	openform();
+//	if(*this)
+//		current_info = data[0];
+//	while(ismodal()) {
+//		render_main();
+//		dialog(x, y, header, description);
+//		auto x1 = x, y0 = y;
+//		x += metrics::padding * 2;
+//		const auto w2 = 180;
+//		for(auto& e : *this) {
+//			auto checked = (e == current_info);
+//			if(radio(x, y, w2, e.getname(), &e, checked, 0)) {
+//				execute(set_info, *((short unsigned*)&e));
+//		}
+//		render_left(x1, y, w2, score);
+//		render_description(x + w2 + metrics::padding * 2, y0, dialog_w - w2 - (x - x1) - metrics::padding * 2);
+//		footer(x, y);
+//		if(button(x, y, 100, "OK", 0, KeyEnter))
+//			execute(buttonparam, *((short unsigned*)&current_info));
+//		if(button(x, y, 100, "Cancel", 0, KeyEscape))
+//			execute(buttonparam, 0);
+//		domodal();
+//		if(control_dialog())
+//			continue;
+//		control_standart();
+//	}
+//	closeform();
+//	return getresult();
+//}
 
 static void set_num8() {
 	auto p = (unsigned char*)hot.object;
@@ -1093,7 +1099,7 @@ static int show_picture(int x, int y, resource_s id, unsigned frame) {
 	rc.offset(-gui_border);
 	draw::rectf(rc, colors::form, opacity_button);
 	draw::rectb(rc, colors::form);
-	if(mode==2) {
+	if(mode == 2) {
 		surface bm(f.sx, f.sy, 32);
 		auto push = canvas;
 		canvas = &bm;
@@ -1105,7 +1111,7 @@ static int show_picture(int x, int y, resource_s id, unsigned frame) {
 	return rc.height();
 }
 
-const answers::element* answers::choosev(const char* title, const char* cancel_text, bool interactive, resource_s id, short unsigned frame, fnvisible allow, const void* object) const {
+const answers::element* answers::choosev(const char* title, const char* cancel_text, bool interactive, resource_s id, short unsigned frame, fnvisible allow, const void* object, fntext tips) const {
 	int x, y;
 	if(!elements)
 		return 0;
@@ -1113,6 +1119,7 @@ const answers::element* answers::choosev(const char* title, const char* cancel_t
 	while(ismodal()) {
 		render_main();
 		right_dialog(x, y);
+		auto y1 = y;
 		if(id)
 			y += show_picture(x, y, id, frame);
 		if(title) {
@@ -1121,8 +1128,18 @@ const answers::element* answers::choosev(const char* title, const char* cancel_t
 		}
 		x = getwidth() - button_width - gui_border * 2;
 		for(auto& e : elements) {
-			if(windowv(x, y, button_width, e.text, 0))
+			bool need_tips;
+			if(windowv(x, y, button_width, e.text, 0, &need_tips))
 				execute(breakparam, (int)&e);
+			if(need_tips && tips) {
+				tooltips_point.x = x;
+				tooltips_point.y = y1;
+				tooltips_width = window_width + gui_border*4;
+				stringbuilder sb(tooltips_text);
+				auto pi = tips(&e.id, sb);
+				if(pi != sb.begin())
+					sb.add(pi);
+			}
 			y += 2;
 		}
 		if(cancel_text) {
@@ -1189,3 +1206,45 @@ void tilei::edit() {
 		}
 	}
 }
+
+//variant variantc::choosev(const char* title, const char* cancel_text, bool interactive, resource_s id, short unsigned frame, fnvisible allow, const void* object, fntext tips) const {
+//	int x, y;
+//	if(!count)
+//		return 0;
+//	openform();
+//	while(ismodal()) {
+//		render_main();
+//		right_dialog(x, y);
+//		if(id)
+//			y += show_picture(x, y, id, frame);
+//		if(title) {
+//			windowm(x, y, window_width, title);
+//			y += metrics::padding;
+//		}
+//		x = getwidth() - button_width - gui_border * 2;
+//		for(auto& e : *this) {
+//			bool need_tips;
+//			auto y1 = y;
+//			if(windowv(x, y, button_width, e.getname(), 0, &need_tips))
+//				execute(breakparam, (int)e);
+//			if(need_tips && tips) {
+//				tooltips_point.x = x - gui_border;
+//				tooltips_point.y = y1 - gui_border;
+//				tooltips_width = window_width;
+//				stringbuilder sb(tooltips_text);
+//				tips(&e, sb);
+//			}
+//			y += 2;
+//		}
+//		if(cancel_text) {
+//			if(windowv(x, y, button_width, cancel_text, KeyEscape))
+//				execute(breakparam, 0);
+//		}
+//		if(allow && allow(object))
+//			execute(breakparam, 0);
+//		domodal();
+//		control_standart();
+//	}
+//	closeform();
+//	return getresult();
+//}

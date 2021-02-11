@@ -24,7 +24,7 @@ void creaturei::uicombat() {
 			auto& e = bsdata<actioni>::elements[ActionEndTurn];
 			aw.add((int)&e, e.name);
 		}
-		auto pe = aw.choosev(0, 0, true, ResNone, 0, ischangedposition, 0);
+		auto pe = aw.choosev(0, 0, true, ResNone, 0, ischangedposition, 0, 0);
 		if(!pe)
 			continue;
 		auto p = (void*)pe->id;
