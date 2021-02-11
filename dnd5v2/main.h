@@ -421,7 +421,6 @@ class creaturei : public statistic, public drawable, public nameablei {
 	itemf				spells_focus;
 	alignment_s			alignment;
 	domain_s			domain;
-	void				apply(const varianta& source, modifier_s modifier = NoModifier);
 	void				apply(variant v, modifier_s modifier);
 	void				apply(variant object, int level, bool interactive);
 	void				finish();
@@ -429,6 +428,7 @@ class creaturei : public statistic, public drawable, public nameablei {
 public:
 	void				add(ability_s v, int i) { set(v, get(v) + i); }
 	void				aftercombatround();
+	void				apply(const varianta& source, modifier_s modifier = NoModifier);
 	bool				attack(creaturei* target, int bonus, int advantages);
 	void				beforecombatround();
 	void				clear() { memset(this, 0, sizeof(*this)); }

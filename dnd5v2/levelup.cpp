@@ -5,6 +5,7 @@ static varianta all_languages = {LanguageCommon, LanguageDwarvish, LanguageHalfl
 static varianta cleric_cantrips = {Guidance, Light, Resistance, SacredFlame, SpareTheDying, Thaumaturgy};
 static varianta artisan_tools = {CarpentersTools, CartographersTools, CobblersTools, GlassblowersTools, JewelersTools, LeatherworkersTools, MassonsTools, PottersTools, SmithsTools, TinkersTools, WeaversTools, WoodcuttersTools};
 static varianta game_set = {Dices, DragonChess, PlayingCards, ThreeDragonAnte};
+static varianta wizards_cantrips = {AcidSplash, DancingLights, FireBolt, MageHand, MinorIllusion, PoisonSpray, Prestidigitation, RayOfFrost, ShockingGrasp};
 
 BSDATA(levelupi) = {
 	{"Ability Score Increase", Dwarf, 0, {Constitution, Constitution}},
@@ -27,7 +28,7 @@ BSDATA(levelupi) = {
 	{"Languages", Elf, 0, {LanguageCommon, LanguageElvish}},
 	{"Ability Score Increase", ElfHight, 0, {Intellegence}},
 	{"Elf Weapon Training", ElfHight, 0, {Longbow, Longsword, Shortbow, Shortsword}},
-	{"Cantrip", ElfHight, 0, {Longbow, Longsword, Shortbow, Shortsword}},
+	{"Cantrip", ElfHight, 0, wizards_cantrips, 1},
 	{"Extra Languages", ElfHight, 0, all_languages, 1},
 	{"Ability Score Increase", ElfWood, 0, {Wisdow}},
 	{"Elf Weapon Training", ElfWood, 0, {Longbow, Longsword, Shortbow, Shortsword}},

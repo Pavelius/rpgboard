@@ -11,7 +11,28 @@ static void addlu(stringbuilder& sb, variant v, int level) {
 		if(e.object != v || e.level != level)
 			continue;
 		addh(sb, e.name);
-		sb.adds(e.text);
+		if(strcmp(e.id, "Speed") == 0) {
+			creaturei player = {};
+			player.set(Speed, 6);
+			player.apply(e.source);
+			sb.adds(e.text, player.get(Speed) * 5);
+		} else if(strcmp(e.id, "Ability Score Increase") == 0) {
+			creaturei player = {};
+			for(auto i = Strenght; i <= Charisma; i = (ability_s)(i + 1))
+				player.set(i, 10);
+			auto first = false;
+			player.apply(e.source);
+			for(auto i = Strenght; i <= Charisma; i = (ability_s)(i + 1)) {
+				if(player.get(i) == 10)
+					continue;
+				if(first)
+					sb.add(",");
+				sb.adds("%1%+2i", bsdata<abilityi>::elements[i].name, player.get(i) - 10);
+				first = true;
+			}
+			sb.adds(e.text, player.get(Speed) * 5);
+		} else
+			sb.adds(e.text);
 	}
 }
 
