@@ -211,12 +211,12 @@ int io::sock::open(const char* url, const char* port) {
 	return 0;
 }
 
-int io::sock::write(const char* buffer, unsigned size) {
-	return send(s, buffer, size, 0);
+int io::sock::write(const void* buffer, unsigned size) {
+	return send(s, (const char*)buffer, size, 0);
 }
 
-int io::sock::read(char* buffer, unsigned size) {
-	return recv(s, buffer, size, 0);
+int io::sock::read(void* buffer, unsigned size) {
+	return recv(s, (char*)buffer, size, 0);
 }
 
 int io::sock::stopread() {
@@ -225,6 +225,10 @@ int io::sock::stopread() {
 
 int io::sock::stopwrite() {
 	return shutdown(s, SD_SEND);
+}
+
+int io::sock::stop() {
+	return shutdown(s, SD_BOTH);
 }
 
 int	io::sock::getlasterror() {

@@ -12,10 +12,11 @@ public:
 	static int			initialize();
 	static int			getlasterror();
 	int					open(const char* url, const char* port);
-	int					read(char* buffer, unsigned size);
+	int					read(void* buffer, unsigned size);
+	int					stop();
 	int					stopwrite();
 	int					stopread();
 	int					waitclient(sock& client) const;
-	int					write(const char* buffer, unsigned size);
+	int					write(const void* buffer, unsigned size);
 };
 }

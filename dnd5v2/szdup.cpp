@@ -5,14 +5,11 @@ template <class T> struct strcol {
 	strcol*	next;
 	int		count;
 	T		data[256 * 255 / sizeof(T)]; // Inner buffer
-
 	strcol() : next(0), count(0) {
 	}
-
 	~strcol() {
 		seqclear(this);
 	}
-
 	bool has(const T* value) {
 		strcol* e = this;
 		while(e) {
@@ -22,7 +19,6 @@ template <class T> struct strcol {
 		}
 		return false;
 	}
-
 	const T* find(const T* text, int textc) {
 		if(textc == -1)
 			textc = zlen(text);

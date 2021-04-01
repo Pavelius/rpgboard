@@ -498,8 +498,10 @@ typedef void(*callback)();
 point					choosepoint();
 void					initialize();
 }
-namespace io {
-void					startclient();
+namespace network {
+bool					connect();
+void					disconnect();
+void					exchange();
 }
 template<class T> const char* getinfo(const void* object, stringbuilder& sb) { return ((T*)object)->text; }
 template<> const char* getinfo<racei>(const void* object, stringbuilder& sb);

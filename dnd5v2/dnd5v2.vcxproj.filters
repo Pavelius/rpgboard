@@ -37,14 +37,11 @@
     <ClInclude Include="converter.h">
       <Filter>Поддержка</Filter>
     </ClInclude>
-    <ClInclude Include="mutex.h">
-      <Filter>Платформа</Filter>
+    <ClInclude Include="comsrv.h">
+      <Filter>Поддержка</Filter>
     </ClInclude>
     <ClInclude Include="socket.h">
-      <Filter>Платформа</Filter>
-    </ClInclude>
-    <ClInclude Include="thread.h">
-      <Filter>Платформа</Filter>
+      <Filter>Поддержка</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -227,19 +224,7 @@
     <ClCompile Include="action.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
-    <ClCompile Include="mutex.cpp">
-      <Filter>Платформа</Filter>
-    </ClCompile>
-    <ClCompile Include="socket.cpp">
-      <Filter>Платформа</Filter>
-    </ClCompile>
-    <ClCompile Include="thread.cpp">
-      <Filter>Платформа</Filter>
-    </ClCompile>
     <ClCompile Include="message.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="network.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
     <ClCompile Include="menu.cpp">
@@ -256,6 +241,18 @@
     </ClCompile>
     <ClCompile Include="getinfo.cpp">
       <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="network.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="comsrv.cpp">
+      <Filter>Поддержка</Filter>
+    </ClCompile>
+    <ClCompile Include="comsrv_client.cpp">
+      <Filter>Поддержка</Filter>
+    </ClCompile>
+    <ClCompile Include="socket.cpp">
+      <Filter>Поддержка</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

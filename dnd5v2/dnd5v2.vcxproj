@@ -143,18 +143,17 @@
   <ItemGroup>
     <ClInclude Include="bstream.h" />
     <ClInclude Include="color.h" />
+    <ClInclude Include="comsrv.h" />
     <ClInclude Include="converter.h" />
     <ClInclude Include="crt.h" />
     <ClInclude Include="draw.h" />
     <ClInclude Include="io.h" />
     <ClInclude Include="main.h" />
-    <ClInclude Include="mutex.h" />
     <ClInclude Include="point.h" />
     <ClInclude Include="pointl.h" />
     <ClInclude Include="rect.h" />
     <ClInclude Include="socket.h" />
     <ClInclude Include="stringbuilder.h" />
-    <ClInclude Include="thread.h" />
     <ClInclude Include="win.h" />
   </ItemGroup>
   <ItemGroup>
@@ -166,6 +165,8 @@
     <ClCompile Include="background.cpp" />
     <ClCompile Include="bstream.cpp" />
     <ClCompile Include="class.cpp" />
+    <ClCompile Include="comsrv.cpp" />
+    <ClCompile Include="comsrv_client.cpp" />
     <ClCompile Include="creature.cpp" />
     <ClCompile Include="color.cpp" />
     <ClCompile Include="converter.cpp" />
@@ -190,7 +191,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="menu.cpp" />
     <ClCompile Include="message.cpp" />
-    <ClCompile Include="mutex.cpp" />
     <ClCompile Include="nameable.cpp" />
     <ClCompile Include="network.cpp" />
     <ClCompile Include="pack.cpp" />
@@ -210,7 +210,6 @@
     <ClCompile Include="stringbuilder.cpp" />
     <ClCompile Include="surface_serial.cpp" />
     <ClCompile Include="szdup.cpp" />
-    <ClCompile Include="thread.cpp" />
     <ClCompile Include="tile.cpp" />
     <ClCompile Include="trait.cpp" />
     <ClCompile Include="util_main.cpp" />

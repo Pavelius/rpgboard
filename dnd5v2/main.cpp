@@ -1,4 +1,5 @@
 #include "main.h"
+#include "socket.h"
 
 void util_main();
 
@@ -64,8 +65,14 @@ void choose_elements();
 int main(int argc, char* argv[]) {
 	auto u1 = sizeof(creaturei);
 	auto u2 = sizeof(statistic);
+	io::sock::initialize();
 	varianti::localization("ru", false);
 	varianti::localization("debug", true);
+	//run_network("www.freenode.net");
+	//networkv("PASS none\r\n");
+	//networkv("NICK TestUserFoo\r\n");
+	//networkv("USER guest 0 * :TestUserFoo\r\n");
+	//networkv("JOIN #etc");
 	srand(clock());
 	util_main();
 	draw::initialize();
