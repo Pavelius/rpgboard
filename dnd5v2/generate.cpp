@@ -142,7 +142,7 @@ bool creaturei::generate(bool interactive) {
 	if(!v)
 		return false;
 	auto cls = (class_s)v.value;
-	if(false)
+	if(interactive)
 		choose_ability(ChooseAbilities);
 	else
 		random_ability(cls);

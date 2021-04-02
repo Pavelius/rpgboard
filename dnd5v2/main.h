@@ -202,8 +202,6 @@ struct variantc : adat<variant> {
 	variantc(const array& v) { select(v); }
 	void				exclude(variant v);
 	variant				choose(const char* title, int score = 0) const;
-	variant				chooseg(const char* step, const char* title, int score = 0) const;
-	variant				choosev(const char* title, const char* cancel_text, bool interactive, resource_s id, short unsigned frame, fnvisible allow, const void* object, fntext tips) const;
 	void				match(action_s v, bool keep);
 	void				match(state_s v, bool keep);
 	void				match(variant v1, bool keep);

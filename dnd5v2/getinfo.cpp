@@ -1,9 +1,9 @@
 #include "main.h"
 
 static void addh(stringbuilder& sb, const char* title) {
-	sb.addn("**");
+	sb.addn("[!");
 	sb.add(title);
-	sb.add(":**");
+	sb.add(":]");
 }
 
 static void addlu(stringbuilder& sb, variant v, int level) {
