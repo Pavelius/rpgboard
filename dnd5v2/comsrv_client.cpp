@@ -4,7 +4,29 @@
 
 using namespace comsrv;
 
-static io::sock			s;
+static io::sock	s;
+
+static bool read(void* data, unsigned size) {
+	if(!s)
+		return false;
+	while(size) {
+		auto r = s.read(data, size);
+		if(r <= 0) {
+			disconnect();
+			return false;
+		}
+		size -= r;
+		data = (char*)data + r;
+	}
+	return true;
+}
+
+static packet readresult() {
+	packet result = {};
+	if(!read(&result, sizeof(result)))
+		return {InvalidRead, 0};
+	return result;
+}
 
 static void write(const void* data, unsigned size) {
 	if(!s)
@@ -21,37 +43,17 @@ static void write(const void* data, unsigned size) {
 	}
 }
 
-void comsrv::post(type_s code, int p1, int p2) {
+void comsrv::post(type_s code, unsigned param) {
 	packet result = {};
 	result.type = code;
-	result.p1 = p1;
-	result.p2 = p2;
+	result.param = param;
 	write(&result, sizeof(result));
 }
 
-void comsrv::post(type_s code, const void* data, unsigned size, int p2) {
-	post(code, size, p2);
+packet comsrv::post(type_s code, const void* data, unsigned size) {
+	post(code, size);
 	write(data, size);
-}
-
-static bool read(void* data, unsigned size) {
-	if(!s)
-		return false;
-	while(size) {
-		auto r = s.read(data, size);
-		if(r <= 0) {
-			s.stop();
-			s.close();
-			return false;
-		}
-		size -= r;
-		data = (char*)data + r;
-	}
-	return true;
-}
-
-static bool read(packet& e) {
-	return read(&e, sizeof(e));
+	return readresult();
 }
 
 bool comsrv::connect(const char* url, const char* port, type_s querry, const char* chat, const char* user, const char* password) {
@@ -64,11 +66,7 @@ bool comsrv::connect(const char* url, const char* port, type_s querry, const cha
 	header.chat = chat;
 	header.user = user;
 	header.password = password;
-	post(querry, &header, sizeof(header));
-	packet result = {}; read(result);
-	if(result.type != NoError)
-		return false;
-	return true;
+	return !post(querry, &header, sizeof(header));
 }
 
 void comsrv::disconnect() {

@@ -5,9 +5,9 @@
 namespace comsrv {
 enum type_s {
 	NoError,
-	InvalidQuerryType, InvalidP1, InvalidP2,
-	InvalidInputFormat, InvalidProtocol, InvalidProtocolVersion, InvalidLoginOrPassword,
-	CreateChat=1000, JoinChat, GetInfo, GetData, PutData, GetUsers,
+	InvalidQuerryType, InvalidParam,
+	InvalidRead, InvalidInputFormat, InvalidProtocol, InvalidProtocolVersion, InvalidLoginOrPassword,
+	CreateChat = 1000, JoinChat, GetInfo, GetData, PutData, GetUsers,
 };
 const int			major = 0;
 const int			minor = 1;
@@ -38,11 +38,12 @@ struct user : resable {
 };
 struct packet {
 	type_s			type;
-	int				p1, p2;
+	unsigned		param;
+	constexpr explicit operator bool() const { return type != NoError; }
 };
 void				runserver(const char* port);
 bool				connect(const char* url, const char* port, type_s querry, const char* chat, const char* user, const char* password);
 void				disconnect();
-void				post(type_s code, int p1, int p2);
-void				post(type_s code, const void* data, unsigned size, int p2 = 0);
+void				post(type_s code, unsigned param);
+packet				post(type_s code, const void* data, unsigned size);
 }

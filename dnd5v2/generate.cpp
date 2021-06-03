@@ -142,14 +142,15 @@ bool creaturei::generate(bool interactive) {
 	if(!v)
 		return false;
 	auto cls = (class_s)v.value;
-	if(interactive)
-		choose_ability(ChooseAbilities);
-	else
-		random_ability(cls);
 	v = choose_gender(interactive);
 	if(!v)
 		return false;
 	auto gender = (gender_s)v.value;
+	auto race_parent = bsdata<racei>::elements[race].base;
+	if(interactive)
+		choose_ability(ChooseAbilities);
+	else
+		random_ability(cls);
 	v = choose_alignment(interactive);
 	if(!v)
 		return false;
@@ -161,7 +162,7 @@ bool creaturei::generate(bool interactive) {
 	auto portrait = choose_portrait(interactive);
 	if(portrait == -1)
 		return false;
-	auto race_parent = bsdata<racei>::elements[race].base;
+	clear();
 	set(cls, 1);
 	if(race_parent != race)
 		apply(race_parent, 0, interactive);

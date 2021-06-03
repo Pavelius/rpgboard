@@ -6,10 +6,14 @@ static int abilities_cost[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 	2, 3, 4, 5, 7, 9};
 
-int statistic::getabilityscores() const {
+int statistic::getabilityscores(char* modificators) const {
 	auto r = 0;
-	for(auto v : all_abilities)
-		r += maptbl(abilities_cost, abilities[v]);
+	for(auto v : all_abilities) {
+		auto n = abilities[v];
+		if(modificators)
+			n -= modificators[v - Strenght];
+		r += maptbl(abilities_cost, n);
+	}
 	return r;
 }
 

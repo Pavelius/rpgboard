@@ -403,7 +403,7 @@ struct statistic {
 	bool				choose_ability(const char* step, const char* title, int score_maximum);
 	static int			choose_frame(resource_s resource, const char* header, const char* description, point size);
 	int					getabilityscore(int v);
-	int					getabilityscores() const;
+	int					getabilityscores(char* modificators) const;
 	void				random_ability(class_s clas);
 };
 struct rollstati {

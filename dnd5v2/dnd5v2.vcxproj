@@ -241,6 +241,7 @@
     <Text Include="..\locale\ru\School.txt" />
     <Text Include="..\locale\ru\Skill.txt" />
     <Text Include="..\locale\ru\Spell.txt" />
+    <Text Include="rules.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

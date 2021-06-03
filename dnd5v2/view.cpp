@@ -669,8 +669,11 @@ static void render_main() {
 	}
 	for(auto& e : bsdata<drawable>())
 		e.paint(-hotcamera.x, -hotcamera.y, false);
-	for(auto& e : bsdata<creaturei>())
+	for(auto& e : bsdata<creaturei>()) {
+		if(!e.is(Active))
+			continue;
 		e.paint(-hotcamera.x, -hotcamera.y, true, true);
+	}
 }
 
 point draw::choosepoint() {
@@ -983,10 +986,13 @@ bool statistic::choose_ability(const char* header, const char* description, int 
 			windowp(x, y, window_width, description);
 			y += metrics::padding;
 		}
-		rect rc = {x, y, x + window_width, y + texth() * 10};
+		auto cost = getabilityscores(0);
+		auto cost_left = score_maximum - cost;
+		rect rc = {x, y, x + window_width, y + (texth() + 5) * 6};
+		if(cost_left)
+			rc.y2 += texth() + metrics::padding * 3;
 		window(rc, false, false);
 		auto x1 = x, y0 = y;
-		auto cost = getabilityscores();
 		for(auto v : all_abilities) {
 			variant vr = v;
 			auto current = abilities[v];
@@ -998,7 +1004,13 @@ bool statistic::choose_ability(const char* header, const char* description, int 
 			else if(r == -1)
 				execute(set_num8, abilities[v] - 1, &abilities[v]);
 		}
-		render_cost(x, y + metrics::padding * 2, window_width, getabilityscores(), score_maximum);
+		if(cost_left)
+			render_cost(x, y + metrics::padding * 2, window_width, cost, score_maximum);
+		y = rc.y2 + metrics::padding + gui_border*2;
+		if(cost_left == 0) {
+			if(windowv(x, y, button_width, "Принять", KeyEnter))
+				execute(breakparam, 1);
+		}
 		domodal();
 		if(control_dialog())
 			continue;
@@ -1031,7 +1043,7 @@ const answers::element* answers::choosev(const char* title, const char* cancel_t
 			if(need_tips && tips) {
 				tooltips_point.x = x;
 				tooltips_point.y = y1;
-				tooltips_width = window_width + gui_border*4;
+				tooltips_width = window_width + gui_border * 4;
 				stringbuilder sb(tooltips_text);
 				auto pi = tips(&e.id, sb);
 				if(pi != sb.begin())

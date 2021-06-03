@@ -1,0 +1,10 @@
+[
+{"id": "Bless",
+"range":120,
+"damage" : {"c":1, "d":8},
+"level" : 1,
+"target" : "hostile creature",
+"duration" : "60 hours"
+"save" : {"type" : "Will", "effect" : "Negate"}
+}
+]

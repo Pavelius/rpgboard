@@ -41,7 +41,7 @@ BSDATA(levelupi) = {
 	{"Languages", Halfling, 0, {LanguageCommon, LanguageHalfling}},
 	{"Ability Score Increase", HalflingLightfoot, 0, {Charisma}},
 	{"Naturaly stealthy", HalflingLightfoot, 0, {HideWhenObscuredLargerCreature}},
-	{"Ability Score Increase", HalflingLightfoot, 0, {Constitution}},
+	{"Ability Score Increase", HalflingStout, 0, {Constitution}},
 	{"Stout Resilence", HalflingStout, 0, {Advantage, SaveVsPoison, Resist, Poison}},
 	{"Ability Score Increase", Human, 0, {Strenght, Dexterity, Constitution, Intellegence, Wisdow, Charisma}},
 	{"Skill Proficiencies", Acolyte, 0, {Insight, Religion}},
